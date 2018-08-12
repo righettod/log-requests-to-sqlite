@@ -8,7 +8,6 @@ os:
 
 jdk:
   - oraclejdk8
-  - openjdk8
 
 install:
   - chmod +x gradlew
