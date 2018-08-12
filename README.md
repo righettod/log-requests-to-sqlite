@@ -27,9 +27,9 @@ So, i have decided to write this extension in order to keep the information of a
 
 Once loaded, the extension create, if needed, a DB file named **ActivityTrailLog.db** in the **user home folder** and silently record every HTTP request send during the BURP session.
 
-![Extension Log](example01.png)
+![Extension Log](example1.png)
 
-![DB Content](example02.png)
+![DB Content](example2.png)
 
 # Build the extension JAR file
 
