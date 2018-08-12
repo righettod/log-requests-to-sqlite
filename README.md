@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/righettod/activity-trail-log.svg?branch=master)](https://travis-ci.org/righettod/activity-trail-log)
+
 # Activity Trail Log
 
 This extension have a single objective: 
