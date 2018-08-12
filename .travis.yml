@@ -1,0 +1,17 @@
+language: java
+
+sudo: enabled
+
+os:
+  - linux
+  - osx
+
+jdk:
+  - oraclejdk8
+  - openjdk8
+
+install:
+  - chmod +x gradlew
+
+script:
+  - ./gradlew clean fatJar
