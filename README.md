@@ -29,7 +29,7 @@ Once loaded, the extension create, if needed, a DB file named **ActivityTrailLog
 
 ![Extension Log](example1.png)
 
-![DB Content](example2.png)
+![DB Content](example2.jpg)
 
 # Build the extension JAR file
 
