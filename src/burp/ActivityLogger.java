@@ -76,17 +76,14 @@ class ActivityLogger implements IExtensionStateListener {
     /**
      * Save an activity event into the storage.
      *
-     * @param toolFlag    A flag indicating the Burp tool that issued the request.
-     *                    Burp tool flags are defined in the
-     *                    <code>IBurpExtenderCallbacks</code> interface.
-     * @param messageInfo Details of the request / response to be processed.
-     *                    Extensions can call the setter methods on this object to update the
-     *                    current message and so modify Burp's behavior.
+     * @param toolFlag   A flag indicating the Burp tool that issued the request.
+     *                   Burp tool flags are defined in the
+     *                   <code>IBurpExtenderCallbacks</code> interface.
+     * @param reqInfo    Details of the request to be processed.
+     * @param reqContent Raw content of the request.
      * @throws Exception If event cannot be saved.
      */
-    void logEvent(int toolFlag, IHttpRequestResponse messageInfo) throws Exception {
-        //Extract useful information from the request
-        IRequestInfo reqInfo = callbacks.getHelpers().analyzeRequest(messageInfo);
+    void logEvent(int toolFlag, IRequestInfo reqInfo, byte[] reqContent) throws Exception {
         //Verify that the DB connection is still opened
         if (this.storageConnection.isClosed()) {
             //Get new one
@@ -100,7 +97,7 @@ class ActivityLogger implements IExtensionStateListener {
             stmt.setString(2, reqInfo.getUrl().toString());
             stmt.setString(3, reqInfo.getMethod());
             stmt.setString(4, callbacks.getToolName(toolFlag));
-            stmt.setString(5, callbacks.getHelpers().bytesToString(messageInfo.getRequest()));
+            stmt.setString(5, callbacks.getHelpers().bytesToString(reqContent));
             stmt.setString(6, LocalDateTime.now().format(this.datetimeFormatter));
             int count = stmt.executeUpdate();
             if (count != 1) {

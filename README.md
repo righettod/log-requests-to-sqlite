@@ -31,6 +31,12 @@ Once loaded, the extension create, if needed, a DB file named **ActivityTrailLog
 
 ![DB Content](example2.png)
 
+There is an option to restrict the logging to the requests that are included into the defined target scope (BURP tab **Target** > **Scope**):
+
+![Option Menu State 1](example3.png)
+
+![Option Menu State 2](example4.png)
+
 # Build the extension JAR file
 
 Use the following command and the JAR file will be located in folder **build/lib**:
@@ -40,6 +46,10 @@ $ gradlew clean fatJar
 ```
 
 # Change log
+
+**1.0.1**
+
+* Add the option to restrict the logging to the requests that are included into the defined target scope.
 
 **1.0.0**
 
