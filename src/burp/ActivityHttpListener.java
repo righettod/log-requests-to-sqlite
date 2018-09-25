@@ -1,5 +1,7 @@
 package burp;
 
+import java.util.Locale;
+
 /**
  * Handle the recording of HTTP activities into the activity log storage.
  */
@@ -38,23 +40,53 @@ class ActivityHttpListener implements IHttpListener {
      */
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         try {
-            //Save the information of the current request if the message is an HTTP request and according to the scope restriction option
+            //Save the information of the current request if the message is an HTTP request and according to the restriction options
             if (messageIsRequest) {
-                boolean mustLogRequest = false;
                 IRequestInfo reqInfo = callbacks.getHelpers().analyzeRequest(messageInfo);
-                if (!ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE) {
-                    mustLogRequest = true;
-                } else if (this.callbacks.isInScope(reqInfo.getUrl())) {
-                    mustLogRequest = true;
-                }
-
-                //Log the request if the condition are meet
-                if (mustLogRequest) {
+                if (this.mustLogRequest(reqInfo)) {
                     this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest());
                 }
             }
         } catch (Exception e) {
             this.trace.writeLog("Cannot save request: " + e.getMessage());
         }
+    }
+
+    /**
+     * Determine if the current request must be logged according to the configuration options selected by the users.
+     *
+     * @param reqInfo Information about the current request
+     * @return TRUE if the request must be logged, FALSE otherwise
+     */
+    private boolean mustLogRequest(IRequestInfo reqInfo) {
+        //By default: Request is logged
+        boolean mustLogRequest = true;
+
+        //First: We check if we must apply restriction about image resource
+        if (ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS) {
+            //Get the file extension of the current URL and remove the parameters from the URL
+            String filename = reqInfo.getUrl().getFile();
+            if (filename != null && filename.indexOf('?') != -1) {
+                filename = filename.substring(0, filename.indexOf('?')).trim();
+            }
+            if (filename != null && filename.indexOf('#') != -1) {
+                filename = filename.substring(0, filename.indexOf('#')).trim();
+            }
+            if (filename != null && filename.lastIndexOf('.') != -1) {
+                String extension = filename.substring(filename.lastIndexOf('.') + 1).trim().toLowerCase(Locale.US);
+                if (ConfigMenu.IMAGE_RESOURCE_EXTENSIONS.contains(extension)) {
+                    mustLogRequest = false;
+                }
+            }
+        }
+
+        //Secondly: We check if we must apply restriction about the URL scope
+        //Configuration restrictions options are applied in sequence so we only work here if the request is marked to be logged
+        if (mustLogRequest && ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE && !this.callbacks.isInScope(reqInfo.getUrl())) {
+            mustLogRequest = false;
+        }
+
+        return mustLogRequest;
+
     }
 }

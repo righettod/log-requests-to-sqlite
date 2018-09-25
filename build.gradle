@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 group 'eu.righettod'
-version '1.0.1'
+version '1.0.2'
 
 repositories {
     mavenCentral()

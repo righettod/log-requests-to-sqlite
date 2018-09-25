@@ -33,9 +33,18 @@ Once loaded, the extension create, if needed, a DB file named **ActivityTrailLog
 
 There is an option to restrict the logging to the requests that are included into the defined target scope (BURP tab **Target** > **Scope**):
 
-![Option Menu State 1](example3.png)
+![Scope Option Menu State 1](example3.png)
 
-![Option Menu State 2](example4.png)
+![Scope Option Menu State 2](example4.png)
+
+There is an option to exclude the logging of the requests that target images:
+
+![Image Option Menu State 1](example5.png)
+
+![Image Option Menu State 2](example6.png)
+
+The list of supported file extensions is [here](resources/settings.properties).
+
 
 # Build the extension JAR file
 
@@ -46,6 +55,10 @@ $ gradlew clean fatJar
 ```
 
 # Change log
+
+**1.0.2 (Current in progress)**
+
+See the associated [milestone](https://github.com/righettod/activity-trail-log/milestone/1).
 
 **1.0.1**
 

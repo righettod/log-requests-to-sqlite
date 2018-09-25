@@ -7,21 +7,41 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
- * Menu to configure the extension options. Currently, there only a single option that allow to restrict the logging to defined target scope.
+ * Menu to configure the extension options.
  */
 class ConfigMenu implements Runnable, IExtensionStateListener {
 
     /**
-     * Expose the single configuration option to the extension classes.
+     * Expose the configuration option for the restriction of the logging of requests in defined target scope.
      */
     static volatile boolean ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.FALSE;
 
     /**
-     * Option configuration key.
+     * Expose the configuration option for the exclusion of the image resource requests from the logging.
      */
-    private static final String CFG_KEY = "ONLY_INCLUDE_REQUESTS_FROM_SCOPE";
+    static volatile boolean EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.FALSE;
+
+    /**
+     * Expose the list of all possible extensions of image resource to work in combination with the option "EXCLUDE_IMAGE_RESOURCE_REQUESTS".
+     */
+    static final List<String> IMAGE_RESOURCE_EXTENSIONS = new ArrayList<>();
+
+    /**
+     * Option configuration key for the restriction of the logging of requests in defined target scope.
+     */
+    private static final String ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY = "ONLY_INCLUDE_REQUESTS_FROM_SCOPE";
+
+    /**
+     * Option configuration key for the exclusion of the image resource requests from the logging.
+     */
+    private static final String EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY = "EXCLUDE_IMAGE_RESOURCE_REQUESTS";
 
     /**
      * Extension root configuration menu.
@@ -38,7 +58,6 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
      */
     private Trace trace;
 
-
     /**
      * Constructor.
      *
@@ -48,10 +67,22 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     ConfigMenu(IBurpExtenderCallbacks callbacks, Trace trace) {
         this.callbacks = callbacks;
         this.trace = trace;
+        String value;
+        //Load the extension settings
+        if (IMAGE_RESOURCE_EXTENSIONS.isEmpty()) {
+            ResourceBundle settingsBundle = ResourceBundle.getBundle("settings");
+            value = settingsBundle.getString("image.extensions").replaceAll(" ", "").toLowerCase(Locale.US);
+            Collections.addAll(IMAGE_RESOURCE_EXTENSIONS, value.split(","));
+            this.trace.writeLog("Image resource extensions list successfully loaded: " + IMAGE_RESOURCE_EXTENSIONS.toString());
+        }
         //Load the save state of the options
-        String value = this.callbacks.loadExtensionSetting(CFG_KEY);
+        value = this.callbacks.loadExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY);
         if (value != null) {
             ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.parseBoolean(value);
+        }
+        value = this.callbacks.loadExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY);
+        if (value != null) {
+            EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.parseBoolean(value);
         }
     }
 
@@ -61,23 +92,41 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     @Override
     public void run() {
         //Build the menu
-        String menuText = "Log only requests from defined target scope";
         this.cfgMenu = new JMenu("Audit Trail");
-        final JCheckBoxMenuItem scopeMenuItem = new JCheckBoxMenuItem(menuText, ONLY_INCLUDE_REQUESTS_FROM_SCOPE);
-        scopeMenuItem.addActionListener(new AbstractAction(menuText) {
+        //Add the sub menu to restrict the logging of requests in defined target scope
+        String menuText = "Log only requests from defined target scope";
+        final JCheckBoxMenuItem subMenuRestrictToScope = new JCheckBoxMenuItem(menuText, ONLY_INCLUDE_REQUESTS_FROM_SCOPE);
+        subMenuRestrictToScope.addActionListener(new AbstractAction(menuText) {
             public void actionPerformed(ActionEvent e) {
-                if (scopeMenuItem.isSelected()) {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(CFG_KEY, Boolean.TRUE.toString());
-                    ConfigMenu.this.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.TRUE;
+                if (subMenuRestrictToScope.isSelected()) {
+                    ConfigMenu.this.callbacks.saveExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.TRUE;
                     ConfigMenu.this.trace.writeLog("From now, only requests from defined target scope will be logged.");
                 } else {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(CFG_KEY, Boolean.FALSE.toString());
-                    ConfigMenu.this.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.FALSE;
-                    ConfigMenu.this.trace.writeLog("From now, all requests will be logged.");
+                    ConfigMenu.this.callbacks.saveExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.FALSE;
+                    ConfigMenu.this.trace.writeLog("From now, requests that are not in defined target scope will be also logged.");
                 }
             }
         });
-        this.cfgMenu.add(scopeMenuItem);
+        this.cfgMenu.add(subMenuRestrictToScope);
+        //Add the sub menu to exclude the image resource requests from the logging.
+        menuText = "Exclude the image resource requests";
+        final JCheckBoxMenuItem subMenuExcludeImageResources = new JCheckBoxMenuItem(menuText, EXCLUDE_IMAGE_RESOURCE_REQUESTS);
+        subMenuExcludeImageResources.addActionListener(new AbstractAction(menuText) {
+            public void actionPerformed(ActionEvent e) {
+                if (subMenuExcludeImageResources.isSelected()) {
+                    ConfigMenu.this.callbacks.saveExtensionSetting(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.TRUE;
+                    ConfigMenu.this.trace.writeLog("From now, requests for image resource will not be logged.");
+                } else {
+                    ConfigMenu.this.callbacks.saveExtensionSetting(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.FALSE;
+                    ConfigMenu.this.trace.writeLog("From now, requests for image resource will be logged.");
+                }
+            }
+        });
+        this.cfgMenu.add(subMenuExcludeImageResources);
         //Add it to BURP menu
         JFrame burpFrame = ConfigMenu.getBurpFrame();
         if (burpFrame != null) {
