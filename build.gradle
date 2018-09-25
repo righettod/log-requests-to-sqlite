@@ -2,6 +2,8 @@ apply plugin: 'java'
 
 group 'eu.righettod'
 version '1.0.2'
+def burpExtensionHomepage = 'https://github.com/righettod/log-requests-to-sqlite'
+def burpExtensionJarName = 'LogRequestsToSQLite.jar'
 
 repositories {
     mavenCentral()
@@ -30,9 +32,9 @@ compileJava {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes ("Implementation-Version" : project.version)
+        attributes("Implementation-Version": project.version, "Implementation-Title": project.name, "Implementation-URL": burpExtensionHomepage)
     }
-    baseName = project.name
+    archiveName = burpExtensionJarName
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

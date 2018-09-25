@@ -13,7 +13,7 @@ public class BurpExtender implements IBurpExtender {
      */
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         try {
-            String extensionName = "ActivityTrailLog";
+            String extensionName = "LogRequestsToSQLite";
             callbacks.setExtensionName(extensionName);
             Trace trace = new Trace(callbacks);
             ConfigMenu configMenu = new ConfigMenu(callbacks, trace);

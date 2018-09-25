@@ -92,7 +92,7 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     @Override
     public void run() {
         //Build the menu
-        this.cfgMenu = new JMenu("Audit Trail");
+        this.cfgMenu = new JMenu("Log Requests to SQLite");
         //Add the sub menu to restrict the logging of requests in defined target scope
         String menuText = "Log only requests from defined target scope";
         final JCheckBoxMenuItem subMenuRestrictToScope = new JCheckBoxMenuItem(menuText, ONLY_INCLUDE_REQUESTS_FROM_SCOPE);
