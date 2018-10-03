@@ -58,9 +58,14 @@ $ gradlew clean fatJar
 
 # Change log
 
-**1.0.2 (Current in progress)**
+**1.0.3 (Current in progress)**
 
-See the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/1).
+See the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/2).
+
+**1.0.2**
+
+* Add option to exclude image from logging.
+* Prepare and finalize publishing of the extension to the BAppStore.
 
 **1.0.1**
 
