@@ -12,11 +12,12 @@ public class BurpExtender implements IBurpExtender {
      * {@inheritDoc}
      */
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
+        ConfigMenu configMenu = null;
         try {
             String extensionName = "LogRequestsToSQLite";
             callbacks.setExtensionName(extensionName);
             Trace trace = new Trace(callbacks);
-            ConfigMenu configMenu = new ConfigMenu(callbacks, trace);
+            configMenu = new ConfigMenu(callbacks, trace);
             SwingUtilities.invokeLater(configMenu);
             String storeFileName = new File(System.getProperty("user.home"), extensionName + ".db").getAbsolutePath().replaceAll("\\\\", "/");
             ActivityLogger activityLogger = new ActivityLogger(storeFileName, callbacks, trace);
@@ -26,6 +27,10 @@ public class BurpExtender implements IBurpExtender {
             callbacks.registerExtensionStateListener(configMenu);
         } catch (Exception e) {
             callbacks.issueAlert("Cannot start the extension: " + e.getMessage());
+            //Unload the menu if the extension cannot be loaded
+            if (configMenu != null) {
+                configMenu.extensionUnloaded();
+            }
         }
     }
 }
