@@ -58,9 +58,13 @@ $ gradlew clean fatJar
 
 # Change log
 
-**1.0.3 (Current in progress)**
+**1.0.4 (Current in progress)**
 
-See the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/2).
+See the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/3).
+
+**1.0.3**
+
+* Fix the bug described in issue #4.
 
 **1.0.2**
 

@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 group 'eu.righettod'
-version '1.0.3'
+version '1.0.4'
 def burpExtensionHomepage = 'https://github.com/righettod/log-requests-to-sqlite'
 def burpExtensionJarName = 'LogRequestsToSQLite.jar'
 
