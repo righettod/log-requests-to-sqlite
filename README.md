@@ -27,6 +27,8 @@ So, I have decided to write this extension in order to keep the information of a
 
 Once loaded, the extension ask the user to choose the target database file (location and name) to use for the SQLite database or to continue using the current defined file in the previous session.
 
+Regarding the file name to use, there no constraint applied on it but I recommend to use a file with the `.db` extension to facilitate the usage with a SQLite client for exploration operations.
+
 After, the extension silently records every HTTP request send during the BURP session.
 
 ![Extension Log](example1.png)
