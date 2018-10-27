@@ -46,6 +46,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     private static final String EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY = "EXCLUDE_IMAGE_RESOURCE_REQUESTS";
 
     /**
+     * Option configuration key to allow the user to use a custom location and name for the DB file.
+     */
+    public static final String DB_FILE_CUSTOM_LOCATION_CFG_KEY = "DB_FILE_CUSTOM_LOCATION";
+
+    /**
      * Extension root configuration menu.
      */
     private JMenu cfgMenu;
