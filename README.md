@@ -47,6 +47,13 @@ There is an option to exclude the logging of the requests that target images (ch
 
 The list of supported file extensions is [here](resources/settings.properties).
 
+## Statistics
+
+There is an option to obtain statistics about the information logged in the database:
+
+![Image Stats Menu 1](example5a.png)
+
+![Image Stats Menu 2](example5b.png)
 
 # Build the extension JAR file
 

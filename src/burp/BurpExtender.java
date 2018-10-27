@@ -18,16 +18,16 @@ public class BurpExtender implements IBurpExtender {
         try {
             callbacks.setExtensionName(extensionName);
             Trace trace = new Trace(callbacks);
-            configMenu = new ConfigMenu(callbacks, trace);
-            SwingUtilities.invokeLater(configMenu);
             String storeFileName = new File(System.getProperty("user.home"), extensionName + ".db").getAbsolutePath().replaceAll("\\\\", "/");
             ActivityLogger activityLogger = new ActivityLogger(storeFileName, callbacks, trace);
             ActivityHttpListener activityHttpListener = new ActivityHttpListener(activityLogger, trace, callbacks);
+            configMenu = new ConfigMenu(callbacks, trace, activityLogger);
+            SwingUtilities.invokeLater(configMenu);
             callbacks.registerHttpListener(activityHttpListener);
             callbacks.registerExtensionStateListener(activityLogger);
             callbacks.registerExtensionStateListener(configMenu);
         } catch (Exception e) {
-            String errMsg = "Cannot start the extension due to the following reason: \n\r" + e.getMessage();
+            String errMsg = "Cannot start the extension due to the following reason:\n\r" + e.getMessage();
             //Unload the menu if the extension cannot be loaded
             if (configMenu != null) {
                 configMenu.extensionUnloaded();

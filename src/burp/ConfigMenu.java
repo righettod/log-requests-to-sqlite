@@ -5,6 +5,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -59,14 +61,21 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     private Trace trace;
 
     /**
+     * Ref on activity logger in order to enable the access to the DB statistics.
+     */
+    private ActivityLogger activityLogger;
+
+    /**
      * Constructor.
      *
-     * @param callbacks Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
-     * @param trace     Ref on project logger.
+     * @param callbacks      Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
+     * @param trace          Ref on project logger.
+     * @param activityLogger Ref on activity logger in order to enable the access to the DB statistics.
      */
-    ConfigMenu(IBurpExtenderCallbacks callbacks, Trace trace) {
+    ConfigMenu(IBurpExtenderCallbacks callbacks, Trace trace, ActivityLogger activityLogger) {
         this.callbacks = callbacks;
         this.trace = trace;
+        this.activityLogger = activityLogger;
         String value;
         //Load the extension settings
         if (IMAGE_RESOURCE_EXTENSIONS.isEmpty()) {
@@ -127,6 +136,28 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
             }
         });
         this.cfgMenu.add(subMenuExcludeImageResources);
+        //Add the sub menu to get statistics about the DB.
+        menuText = "Get statistics about the logged events";
+        final JMenuItem subMenuDBStatsMenuItem = new JMenuItem(menuText);
+        subMenuDBStatsMenuItem.addActionListener(
+                new AbstractAction(menuText) {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            //Get the data
+                            DBStats stats = ConfigMenu.this.activityLogger.getEventsStats();
+                            //Build the message
+                            String buffer = "Size of the database file on the disk: \n\r" + (stats.getSizeOnDisk() / 1024) + " Kb.\n\r";
+                            buffer += "Total number of records in the database: \n\r" + stats.getTotalRecordCount() + " HTTP requests.\n\r";
+                            buffer += "Amount of data sent via HTTP requests: \n\r" + (stats.getTotalRequestsSize() / 1024) + " Kb.";
+                            //Display the information via the UI
+                            JOptionPane.showMessageDialog(ConfigMenu.getBurpFrame(), buffer, "Events statistics", JOptionPane.INFORMATION_MESSAGE);
+                        } catch (Exception exp) {
+                            ConfigMenu.this.trace.writeLog("Cannot obtains statistics about events: " + exp.getMessage());
+                        }
+                    }
+                }
+        );
+        this.cfgMenu.add(subMenuDBStatsMenuItem);
         //Add it to BURP menu
         JFrame burpFrame = ConfigMenu.getBurpFrame();
         if (burpFrame != null) {

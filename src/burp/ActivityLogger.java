@@ -1,9 +1,11 @@
 package burp;
 
 import java.net.InetAddress;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +20,9 @@ class ActivityLogger implements IExtensionStateListener {
      */
     private static final String SQL_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS ACTIVITY (LOCAL_SOURCE_IP TEXT, TARGET_URL TEXT, HTTP_METHOD TEXT, BURP_TOOL TEXT, REQUEST_RAW TEXT, SEND_DATETIME TEXT)";
     private static final String SQL_TABLE_INSERT = "INSERT INTO ACTIVITY (LOCAL_SOURCE_IP,TARGET_URL,HTTP_METHOD,BURP_TOOL,REQUEST_RAW,SEND_DATETIME) VALUES(?,?,?,?,?,?)";
+    private static final String SQL_COUNT_RECORDS = "SELECT COUNT(HTTP_METHOD) FROM ACTIVITY";
+    private static final String SQL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
+
 
     /**
      * Use a single DB connection for performance and to prevent DB file locking issue at filesystem level.
@@ -85,12 +90,7 @@ class ActivityLogger implements IExtensionStateListener {
      */
     void logEvent(int toolFlag, IRequestInfo reqInfo, byte[] reqContent) throws Exception {
         //Verify that the DB connection is still opened
-        if (this.storageConnection.isClosed()) {
-            //Get new one
-            this.trace.writeLog("Open new connection to the storage.");
-            this.storageConnection = DriverManager.getConnection(url);
-            this.storageConnection.setAutoCommit(true);
-        }
+        this.ensureDBState();
         //Insert the event into the storage
         try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TABLE_INSERT)) {
             stmt.setString(1, InetAddress.getLocalHost().getHostAddress());
@@ -103,6 +103,51 @@ class ActivityLogger implements IExtensionStateListener {
             if (count != 1) {
                 this.trace.writeLog("Request was not inserted, no detail available (insertion counter = " + count + ") !");
             }
+        }
+    }
+
+    /**
+     * Extract and compute statistics about the DB.
+     *
+     * @return A VO object containing the statistics.
+     * @throws Exception If computation meet and error.
+     */
+    DBStats getEventsStats() throws Exception {
+        //Verify that the DB connection is still opened
+        this.ensureDBState();
+        //Get the total of the records in the activity table
+        long recordsCount;
+        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_COUNT_RECORDS)) {
+            try (ResultSet rst = stmt.executeQuery()) {
+                recordsCount = rst.getLong(1);
+            }
+        }
+        //Get the amount of data sent, we assume here that 1 character = 1 byte
+        long amountDataSent;
+        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_AMOUNT_DATA_SENT)) {
+            try (ResultSet rst = stmt.executeQuery()) {
+                amountDataSent = rst.getLong(1);
+            }
+        }
+        //Get the size of the file on the disk
+        String fileLocation = this.url.replace("jdbc:sqlite:", "").trim();
+        long fileSize = Paths.get(fileLocation).toFile().length();
+        //Build the VO and return it
+        return new DBStats(fileSize, recordsCount, amountDataSent);
+    }
+
+    /**
+     * Ensure the connection to the DB is valid.
+     *
+     * @throws Exception If connection cannot be verified or opened.
+     */
+    private void ensureDBState() throws Exception {
+        //Verify that the DB connection is still opened
+        if (this.storageConnection.isClosed()) {
+            //Get new one
+            this.trace.writeLog("Open new connection to the storage.");
+            this.storageConnection = DriverManager.getConnection(url);
+            this.storageConnection.setAutoCommit(true);
         }
     }
 
