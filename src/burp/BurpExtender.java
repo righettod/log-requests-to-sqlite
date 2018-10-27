@@ -1,5 +1,6 @@
 package burp;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.io.File;
 
@@ -13,8 +14,8 @@ public class BurpExtender implements IBurpExtender {
      */
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         ConfigMenu configMenu = null;
+        String extensionName = "LogRequestsToSQLite";
         try {
-            String extensionName = "LogRequestsToSQLite";
             callbacks.setExtensionName(extensionName);
             Trace trace = new Trace(callbacks);
             configMenu = new ConfigMenu(callbacks, trace);
@@ -26,11 +27,15 @@ public class BurpExtender implements IBurpExtender {
             callbacks.registerExtensionStateListener(activityLogger);
             callbacks.registerExtensionStateListener(configMenu);
         } catch (Exception e) {
-            callbacks.issueAlert("Cannot start the extension: " + e.getMessage());
+            String errMsg = "Cannot start the extension due to the following reason: \n\r" + e.getMessage();
             //Unload the menu if the extension cannot be loaded
             if (configMenu != null) {
                 configMenu.extensionUnloaded();
             }
+            //Notification of the error in the dashboard tab
+            callbacks.issueAlert(errMsg);
+            //Notification of the error using the UI
+            JOptionPane.showMessageDialog(ConfigMenu.getBurpFrame(), errMsg, extensionName, JOptionPane.ERROR_MESSAGE);
         }
     }
 }

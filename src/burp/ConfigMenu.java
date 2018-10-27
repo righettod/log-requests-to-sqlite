@@ -163,7 +163,7 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
      * @return BURP main frame.
      * @see "https://github.com/PortSwigger/param-miner/blob/master/src/burp/Utilities.java"
      */
-    private static JFrame getBurpFrame() {
+    public static JFrame getBurpFrame() {
         for (Frame f : Frame.getFrames()) {
             if (f.isVisible() && f.getTitle().startsWith(("Burp Suite"))) {
                 return (JFrame) f;
