@@ -67,6 +67,10 @@ Use the following command and the JAR file will be located in folder **build/lib
 $ gradlew clean fatJar
 ```
 
+# BApp Store
+
+The extension is referenced [here](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747).
+
 # Change log
 
 **1.0.4 (Current in progress)**
