@@ -20,12 +20,3 @@ install:
 
 script:
   - ./gradlew clean fatJar dependencyCheckAnalyze
-
-addons:
-  coverity_scan:
-    project:
-      name: "righettod/log-requests-to-sqlite"
-      description: "Trigger audit via TravisCI"
-    notification_email: dominique.righetto@gmail.com
-    build_command: ./gradlew clean fatJar
-    branch_pattern: master
