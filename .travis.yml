@@ -13,5 +13,4 @@ install:
   - chmod +x gradlew
 
 script:
-  - ./gradlew clean fatJar
-  - ./gradlew dependencyCheckAnalyze --debug
+  - ./gradlew clean fatJar dependencyCheckAnalyze
