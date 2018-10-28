@@ -2,6 +2,10 @@ language: java
 
 sudo: enabled
 
+env:
+  global:
+    - secure: "XaacpPCZUBAjKvJgj+TVpzsTGJxV4UgiSaaVVyof6scAv1CUAAl1sly1OIlCbKQkufsvNJGBllaiLOC8BDZEjkZvLhRqqntOFJDxKzn2hpvz9tfZF4AzYEAIBk8eGLKGgBVIXbHbmgPXXDSx5BLVBmhXiXACTPSfcDbFlxnbjwgH1xbYFEdErtytjO1zhuXNlwo0AMYcgJ/djqRK3u0YTuRVicX/8QIHmS+/P/1l76IQNsB8hZcSjlphMvCq7h9JxpNj4rE0JOMkA6bdmLR93sdughpgChiYhyVPaKByjmSopOT9Kowy6Y3JahEug/AZVhyaMjkrhjs+ru/t/U0sWbdC1OLfYW49CqbscgvUSwBrqXsOwCetN/pMy5tndy+7HoafMjowtsrtXrVDn87Wam07VUj6hv0tUKMNUObBYYNpuNT2V8/GLuyoMaTtPE9sdr9PsBsVxnA/S+sLv63qw9B8hK6MJbvVxVKm0kMfWG0enAYE3SsdMiPlkWECCgAvSWkArgWRSGLcdKu4nDH16fIQiR6KXmNdW2ifSs++L1CobxOiqt+Mrkhx+moCe4ITs7yRRlptjjki5x3/dv3OFHs30tosZbo7Kh1xSnzEeNrMhnGfHEznGW3azA8GPxYf+Xe8aTX7foAF8j/KCOR6VcQDam5IJ39qh9FoxM29LX4="
+
 os:
   - linux
   - osx
@@ -9,8 +13,20 @@ os:
 jdk:
   - oraclejdk8
 
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 install:
   - chmod +x gradlew
 
 script:
   - ./gradlew clean fatJar dependencyCheckAnalyze
+
+addons:
+  coverity_scan:
+    project:
+      name: "righettod/log-requests-to-sqlite"
+      description: "Trigger audit via TravisCI"
+    notification_email: dominique.righetto@gmail.com
+    build_command: ./gradlew clean fatJar
+    branch_pattern: master
