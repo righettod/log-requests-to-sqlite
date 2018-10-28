@@ -76,9 +76,11 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 
 # Change log
 
-**1.0.4 (Current in progress)**
+**1.0.4**
 
-See the associated [milestone](/../../milestone/3).
+* Fix the bug described in issue [#5](/../../issues/5).
+* Add statistics about the DB content.
+* Allow the user to select the DB location and file name.
 
 **1.0.3**
 
