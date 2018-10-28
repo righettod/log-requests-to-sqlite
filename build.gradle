@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:3.3.2'
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'org.owasp.dependencycheck'
 
 group 'eu.righettod'
 version '1.0.4'
@@ -28,6 +38,14 @@ sourceSets {
 compileJava {
     targetCompatibility '1.8'
     sourceCompatibility '1.8'
+}
+
+dependencyCheck {
+    autoUpdate = true
+    failOnError = true
+    failBuildOnCVSS = 1
+    cveValidForHours = 12
+    format = 'JSON'
 }
 
 task fatJar(type: Jar) {

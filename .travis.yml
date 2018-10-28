@@ -14,3 +14,4 @@ install:
 
 script:
   - ./gradlew clean fatJar
+  - ./gradlew dependencyCheckAnalyze --debug
