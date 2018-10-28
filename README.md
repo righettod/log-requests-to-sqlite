@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/righettod/log-requests-to-sqlite.svg?branch=master)](https://travis-ci.org/righettod/log-requests-to-sqlite)
 
+[![Coverity Status](https://scan.coverity.com/projects/17099/badge.svg)](https://scan.coverity.com/projects/righettod-log-requests-to-sqlite)
+
 # Log Requests to SQLite
 
 This extension has a single objective: 
