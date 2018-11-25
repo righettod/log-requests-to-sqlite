@@ -11,3 +11,15 @@ jobs:
     - checkout
     - run: 'chmod +x gradlew'
     - run: './gradlew clean fatJar dependencyCheckAnalyze'
+workflows:
+  version: 2
+  night-build:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build
