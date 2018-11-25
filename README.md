@@ -72,6 +72,21 @@ Use the following command and the JAR file will be located in folder **build/lib
 $ gradlew clean fatJar
 ```
 
+# Night build
+
+This [link](https://circleci.com/api/v1.1/project/github/righettod/log-requests-to-sqlite/latest/artifacts) provide the **url** where to download a night build of the extension JAR file:
+
+```json
+[ {
+  "path" : "LogRequestsToSQLite-NightBuild.jar",
+  "pretty_path" : "LogRequestsToSQLite-NightBuild.jar",
+  "node_index" : 0,
+  "url" : "https://11-144454154-gh.circle-artifacts.com/0/LogRequestsToSQLite-NightBuild.jar"
+} ]
+```
+
+The attribute **url** must be used to download the JAR file.
+
 # BApp Store
 
 The extension is referenced [here](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747).
