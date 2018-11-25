@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-    - image: 'circleci/openjdk:8-jdk'
+      - image: 'circleci/openjdk:8-jdk'
     working_directory: ~/repo
     environment:
       JVM_OPTS: '-Xmx3200m'
@@ -11,9 +11,15 @@ jobs:
     - checkout
     - run: 'chmod +x gradlew'
     - run: './gradlew clean fatJar dependencyCheckAnalyze'
+    - store_artifacts:
+      path: build/libs/LogRequestsToSQLite.jar
+      destination: binary
 workflows:
   version: 2
-  night-build:
+  git-push-build:
+    jobs:
+      - build
+  scheduled-night-build:
     triggers:
       - schedule:
           cron: "0 0 * * *"
