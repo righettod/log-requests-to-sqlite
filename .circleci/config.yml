@@ -13,7 +13,7 @@ jobs:
     - run: './gradlew clean fatJar dependencyCheckAnalyze'
     - store_artifacts:
         path: build/libs/LogRequestsToSQLite.jar
-        destination: binary
+        destination: LogRequestsToSQLite-NightBuild.jar
 workflows:
   version: 2
   git-push-build:
