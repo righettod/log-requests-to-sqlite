@@ -12,8 +12,8 @@ jobs:
     - run: 'chmod +x gradlew'
     - run: './gradlew clean fatJar dependencyCheckAnalyze'
     - store_artifacts:
-      path: build/libs/LogRequestsToSQLite.jar
-      destination: binary
+        path: build/libs/LogRequestsToSQLite.jar
+        destination: binary
 workflows:
   version: 2
   git-push-build:
