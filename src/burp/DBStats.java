@@ -24,13 +24,18 @@ class DBStats {
      */
     private long biggestRequestSize;
 
+    /**
+     * Maximum number of hits sent in a second.
+     */
+    private long maxHitsBySecond;
 
 
-    DBStats(long sizeOnDisk, long totalRecordCount, long totalRequestsSize, long biggestRequestSize) {
+    DBStats(long sizeOnDisk, long totalRecordCount, long totalRequestsSize, long biggestRequestSize, long maxHitsBySecond) {
         this.sizeOnDisk = sizeOnDisk;
         this.totalRecordCount = totalRecordCount;
         this.totalRequestsSize = totalRequestsSize;
         this.biggestRequestSize = biggestRequestSize;
+        this.maxHitsBySecond = maxHitsBySecond;
     }
 
     long getSizeOnDisk() {
@@ -45,7 +50,11 @@ class DBStats {
         return totalRequestsSize;
     }
 
-    public long getBiggestRequestSize() {
+    long getBiggestRequestSize() {
         return biggestRequestSize;
+    }
+
+    public long getMaxHitsBySecond() {
+        return maxHitsBySecond;
     }
 }
