@@ -21,7 +21,8 @@ class ActivityLogger implements IExtensionStateListener {
     private static final String SQL_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS ACTIVITY (LOCAL_SOURCE_IP TEXT, TARGET_URL TEXT, HTTP_METHOD TEXT, BURP_TOOL TEXT, REQUEST_RAW TEXT, SEND_DATETIME TEXT)";
     private static final String SQL_TABLE_INSERT = "INSERT INTO ACTIVITY (LOCAL_SOURCE_IP,TARGET_URL,HTTP_METHOD,BURP_TOOL,REQUEST_RAW,SEND_DATETIME) VALUES(?,?,?,?,?,?)";
     private static final String SQL_COUNT_RECORDS = "SELECT COUNT(HTTP_METHOD) FROM ACTIVITY";
-    private static final String SQL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
+    private static final String SQL_TOTAL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
+    private static final String SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT = "SELECT MAX(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
 
 
     /**
@@ -122,18 +123,25 @@ class ActivityLogger implements IExtensionStateListener {
                 recordsCount = rst.getLong(1);
             }
         }
-        //Get the amount of data sent, we assume here that 1 character = 1 byte
-        long amountDataSent;
-        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_AMOUNT_DATA_SENT)) {
+        //Get the total amount of data sent, we assume here that 1 character = 1 byte
+        long totalAmountDataSent;
+        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TOTAL_AMOUNT_DATA_SENT)) {
             try (ResultSet rst = stmt.executeQuery()) {
-                amountDataSent = rst.getLong(1);
+                totalAmountDataSent = rst.getLong(1);
+            }
+        }
+        //Get the amount of data sent by the biggest request, we assume here that 1 character = 1 byte
+        long biggestRequestAmountDataSent;
+        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT)) {
+            try (ResultSet rst = stmt.executeQuery()) {
+                biggestRequestAmountDataSent = rst.getLong(1);
             }
         }
         //Get the size of the file on the disk
         String fileLocation = this.url.replace("jdbc:sqlite:", "").trim();
         long fileSize = Paths.get(fileLocation).toFile().length();
         //Build the VO and return it
-        return new DBStats(fileSize, recordsCount, amountDataSent);
+        return new DBStats(fileSize, recordsCount, totalAmountDataSent, biggestRequestAmountDataSent);
     }
 
     /**

@@ -151,9 +151,10 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
                             //Get the data
                             DBStats stats = ConfigMenu.this.activityLogger.getEventsStats();
                             //Build the message
-                            String buffer = "Size of the database file on the disk: \n\r" + (stats.getSizeOnDisk() / 1024) + " Kb.\n\r";
-                            buffer += "Total number of records in the database: \n\r" + stats.getTotalRecordCount() + " HTTP requests.\n\r";
-                            buffer += "Amount of data sent via HTTP requests: \n\r" + (stats.getTotalRequestsSize() / 1024) + " Kb.";
+                            String buffer = "Size of the database file on the disk: \n\r" + formatStat(stats.getSizeOnDisk()) + ".\n\r";
+                            buffer += "Amount of data sent by the biggest HTTP request: \n\r" + formatStat(stats.getBiggestRequestSize()) + ".\n\r";
+                            buffer += "Total amount of data sent via HTTP requests: \n\r" + formatStat(stats.getTotalRequestsSize()) + ".\n\r";
+                            buffer += "Total number of records in the database: \n\r" + stats.getTotalRecordCount() + " HTTP requests.";
                             //Display the information via the UI
                             JOptionPane.showMessageDialog(ConfigMenu.getBurpFrame(), buffer, "Events statistics", JOptionPane.INFORMATION_MESSAGE);
                         } catch (Exception exp) {
@@ -199,12 +200,41 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
      * @return BURP main frame.
      * @see "https://github.com/PortSwigger/param-miner/blob/master/src/burp/Utilities.java"
      */
-    public static JFrame getBurpFrame() {
+    static JFrame getBurpFrame() {
         for (Frame f : Frame.getFrames()) {
             if (f.isVisible() && f.getTitle().startsWith(("Burp Suite"))) {
                 return (JFrame) f;
             }
         }
         return null;
+    }
+
+    /**
+     * Format a statistic value in KB, MB or GB according to the value passed.
+     *
+     * @param stat Number of bytes.
+     * @return Formatted value.
+     */
+    static String formatStat(long stat) {
+
+        //Units
+        double oneKB = 1024;
+        double oneMB = 1048576;
+        double oneGB = 1073741824;
+
+        //Determine the unit the use
+        double unit = oneKB;
+        String unitLabel = "Kb";
+        if (stat >= oneGB) {
+            unit = oneGB;
+            unitLabel = "Gb";
+        } else if (stat >= oneMB) {
+            unit = oneMB;
+            unitLabel = "Mb";
+        }
+
+        //Computing
+        double amount = stat / unit;
+        return String.format("%.2f %s", amount, unitLabel);
     }
 }
