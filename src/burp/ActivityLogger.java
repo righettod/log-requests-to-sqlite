@@ -23,7 +23,7 @@ class ActivityLogger implements IExtensionStateListener {
     private static final String SQL_COUNT_RECORDS = "SELECT COUNT(HTTP_METHOD) FROM ACTIVITY";
     private static final String SQL_TOTAL_AMOUNT_DATA_SENT = "SELECT TOTAL(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
     private static final String SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT = "SELECT MAX(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
-    private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC;";
+    private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC";
 
 
     /**
@@ -124,25 +124,28 @@ class ActivityLogger implements IExtensionStateListener {
                 recordsCount = rst.getLong(1);
             }
         }
-        //Get the total amount of data sent, we assume here that 1 character = 1 byte
-        long totalAmountDataSent;
-        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TOTAL_AMOUNT_DATA_SENT)) {
-            try (ResultSet rst = stmt.executeQuery()) {
-                totalAmountDataSent = rst.getLong(1);
+        //Get data amount if the DB is not empty
+        long totalAmountDataSent = 0;
+        long biggestRequestAmountDataSent = 0;
+        long maxHitsBySecond = 0;
+        if(recordsCount > 0){
+            //Get the total amount of data sent, we assume here that 1 character = 1 byte
+            try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TOTAL_AMOUNT_DATA_SENT)) {
+                try (ResultSet rst = stmt.executeQuery()) {
+                    totalAmountDataSent = rst.getLong(1);
+                }
             }
-        }
-        //Get the amount of data sent by the biggest request, we assume here that 1 character = 1 byte
-        long biggestRequestAmountDataSent;
-        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT)) {
-            try (ResultSet rst = stmt.executeQuery()) {
-                biggestRequestAmountDataSent = rst.getLong(1);
+            //Get the amount of data sent by the biggest request, we assume here that 1 character = 1 byte
+            try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT)) {
+                try (ResultSet rst = stmt.executeQuery()) {
+                    biggestRequestAmountDataSent = rst.getLong(1);
+                }
             }
-        }
-        //Get the maximum number of hits sent in a second
-        long maxHitsBySecond;
-        try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_MAX_HITS_BY_SECOND)) {
-            try (ResultSet rst = stmt.executeQuery()) {
-                maxHitsBySecond = rst.getLong(1);
+            //Get the maximum number of hits sent in a second
+            try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_MAX_HITS_BY_SECOND)) {
+                try (ResultSet rst = stmt.executeQuery()) {
+                    maxHitsBySecond = rst.getLong(1);
+                }
             }
         }
         //Get the size of the file on the disk
