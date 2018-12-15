@@ -93,6 +93,13 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 
 # Change log
 
+**1.0.5**
+
+* Add new stats and update display:
+    * Add the size of the biggest request sent.
+    * Add the maximal number of requests sent by second.
+    * Review stats display to dynamically adapt data amount in KB, MB or GB.
+
 **1.0.4**
 
 * Fix the bug described in issue [#5](/../../issues/5).
