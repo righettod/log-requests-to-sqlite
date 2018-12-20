@@ -1,9 +1,12 @@
 buildscript {
+    ext{
+        odcPluginVersion = project.hasProperty('odcGradlePluginVersion') ? project.getProperty('odcGradlePluginVersion') : '4.0.1'
+    }
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.owasp:dependency-check-gradle:4.0.0'
+        classpath "org.owasp:dependency-check-gradle:$odcPluginVersion"
     }
 }
 
@@ -11,7 +14,7 @@ apply plugin: 'java'
 apply plugin: 'org.owasp.dependencycheck'
 
 group 'eu.righettod'
-version '1.0.5'
+version '1.0.6'
 def burpExtensionHomepage = 'https://github.com/righettod/log-requests-to-sqlite'
 def burpExtensionJarName = 'LogRequestsToSQLite.jar'
 
