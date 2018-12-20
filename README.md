@@ -72,6 +72,16 @@ Use the following command and the JAR file will be located in folder **build/lib
 $ gradlew clean fatJar
 ```
 
+# Audit third party dependencies
+
+The goal `dependencyCheckAnalyze` can be used to verify if one of the dependencies used contains CVE.
+
+Use the command line option `-PodcGradlePluginVersion=x.x.x` to specify a specific version of the [OWASP Dependency Check Grable plugin](https://mvnrepository.com/artifact/org.owasp/dependency-check-gradle)
+
+```
+$ gradlew -PodcGradlePluginVersion=3.2.1 dependencyCheckAnalyze
+```
+
 # Night build
 
 This [link](https://circleci.com/api/v1.1/project/github/righettod/log-requests-to-sqlite/latest/artifacts) provide the **url** where to download a night build of the extension JAR file:
