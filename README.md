@@ -103,6 +103,10 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 
 # Change log
 
+**1.0.6**
+
+* Upgrade the version of the third party library used to handle the work with the SQLite DB in order to fix exposure to [CVE-2018-20346](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20346).
+
 **1.0.5**
 
 * Add new stats and update display:
