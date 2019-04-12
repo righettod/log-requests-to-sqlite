@@ -3,7 +3,7 @@
 [![Coverity Status](https://scan.coverity.com/projects/17099/badge.svg)](https://scan.coverity.com/projects/righettod-log-requests-to-sqlite)
 [![Known Vulnerabilities](https://snyk.io/test/github/righettod/log-requests-to-sqlite/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/righettod/log-requests-to-sqlite?targetFile=build.gradle)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![BAppStore Version](https://img.shields.io/badge/BApp%20Store-v1.0.6-orange.svg)](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747)
+[![BAppStore Version](https://img.shields.io/badge/BApp%20Store-v1.0.7-orange.svg)](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747)
 
 # Log Requests to SQLite
 
@@ -102,6 +102,13 @@ The attribute **url** must be used to download the JAR file.
 The extension is referenced [here](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747).
 
 # Change log
+
+**1.0.7**
+
+* Upgrade the version of the third party library used to handle the work with the SQLite DB in order to fix exposure to [CVE-2018-20505](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20505).
+* Import directly the Burp java interface files into the java package *burp* in order to fix exposure to:
+    * [CVE-2017-18284](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18284).
+    * [CVE-2017-18285](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18285).
 
 **1.0.6**
 
