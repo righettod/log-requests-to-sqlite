@@ -106,9 +106,6 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 **1.0.7**
 
 * Upgrade the version of the third party library used to handle the work with the SQLite DB in order to fix exposure to [CVE-2018-20505](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20505).
-* Import directly the Burp java interface files into the java package *burp* in order to fix exposure to:
-    * [CVE-2017-18284](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18284).
-    * [CVE-2017-18285](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18285).
 
 **1.0.6**
 

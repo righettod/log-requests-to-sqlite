@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.2.xsd">
+    <suppress>
+        <notes><![CDATA[For CVE-2017-18284 on burp-extender-api upgrade Gentoo]]></notes>
+        <sha1>79325774249c57f97d7adb9f0101ca3338c865a5</sha1>
+        <cve>CVE-2017-18284</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[For CVE-2017-18285 on burp-extender-api upgrade Gentoo]]></notes>
+        <sha1>79325774249c57f97d7adb9f0101ca3338c865a5</sha1>
+        <cve>CVE-2017-18285</cve>
+    </suppress>
+</suppressions>

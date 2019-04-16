@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     compile 'org.xerial:sqlite-jdbc:3.27.2.1'
+    compile 'net.portswigger.burp.extender:burp-extender-api:1.7.22'
 }
 
 sourceSets {
@@ -47,6 +48,7 @@ dependencyCheck {
     failOnError = true
     failBuildOnCVSS = 1
     cveValidForHours = 12
+    suppressionFile = "odc-suppress.xml"
     format = 'JSON'
 }
 
