@@ -16,9 +16,6 @@ jobs:
         destination: LogRequestsToSQLite-NightBuild.jar
 workflows:
   version: 2
-  git-push-build:
-    jobs:
-      - build
   scheduled-night-build:
     triggers:
       - schedule:
