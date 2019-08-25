@@ -62,28 +62,32 @@ class ActivityHttpListener implements IHttpListener {
         //By default: Request is logged
         boolean mustLogRequest = true;
 
-        //First: We check if we must apply restriction about image resource
-        if (ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS) {
-            //Get the file extension of the current URL and remove the parameters from the URL
-            String filename = reqInfo.getUrl().getFile();
-            if (filename != null && filename.indexOf('?') != -1) {
-                filename = filename.substring(0, filename.indexOf('?')).trim();
-            }
-            if (filename != null && filename.indexOf('#') != -1) {
-                filename = filename.substring(0, filename.indexOf('#')).trim();
-            }
-            if (filename != null && filename.lastIndexOf('.') != -1) {
-                String extension = filename.substring(filename.lastIndexOf('.') + 1).trim().toLowerCase(Locale.US);
-                if (ConfigMenu.IMAGE_RESOURCE_EXTENSIONS.contains(extension)) {
-                    mustLogRequest = false;
+        //Initially we check the pause state
+        if (ConfigMenu.IS_LOGGING_PAUSED) {
+            mustLogRequest = false;
+        } else {
+            //First: We check if we must apply restriction about image resource
+            if (ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS) {
+                //Get the file extension of the current URL and remove the parameters from the URL
+                String filename = reqInfo.getUrl().getFile();
+                if (filename != null && filename.indexOf('?') != -1) {
+                    filename = filename.substring(0, filename.indexOf('?')).trim();
+                }
+                if (filename != null && filename.indexOf('#') != -1) {
+                    filename = filename.substring(0, filename.indexOf('#')).trim();
+                }
+                if (filename != null && filename.lastIndexOf('.') != -1) {
+                    String extension = filename.substring(filename.lastIndexOf('.') + 1).trim().toLowerCase(Locale.US);
+                    if (ConfigMenu.IMAGE_RESOURCE_EXTENSIONS.contains(extension)) {
+                        mustLogRequest = false;
+                    }
                 }
             }
-        }
-
-        //Secondly: We check if we must apply restriction about the URL scope
-        //Configuration restrictions options are applied in sequence so we only work here if the request is marked to be logged
-        if (mustLogRequest && ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE && !this.callbacks.isInScope(reqInfo.getUrl())) {
-            mustLogRequest = false;
+            //Secondly: We check if we must apply restriction about the URL scope
+            //Configuration restrictions options are applied in sequence so we only work here if the request is marked to be logged
+            if (mustLogRequest && ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE && !this.callbacks.isInScope(reqInfo.getUrl())) {
+                mustLogRequest = false;
+            }
         }
 
         return mustLogRequest;

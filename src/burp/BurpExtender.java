@@ -22,32 +22,53 @@ public class BurpExtender implements IBurpExtender {
             //Extension init.
             callbacks.setExtensionName(extensionName);
             Trace trace = new Trace(callbacks);
-            //Ask to the user if he want to continue to log the events in the current DB file
+            //If the logging is not paused then ask to the user if he want to continue to log the events in the current DB file or pause the logging
             String defaultStoreFileName = new File(System.getProperty("user.home"), extensionName + ".db").getAbsolutePath().replaceAll("\\\\", "/");
             String customStoreFileName = callbacks.loadExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
             if (customStoreFileName == null) {
                 customStoreFileName = defaultStoreFileName;
             }
-            int loggingQuestionReply = JOptionPane.showConfirmDialog(burpFrame, "Continue to log events into the following database file?\n\r" + customStoreFileName, extensionName, JOptionPane.YES_NO_OPTION);
-            if (loggingQuestionReply == JOptionPane.NO_OPTION) {
-                JFileChooser customStoreFileNameFileChooser = new JFileChooser();
-                customStoreFileNameFileChooser.setDialogTitle(extensionName + " - Select the DB file to use...");
-                customStoreFileNameFileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                customStoreFileNameFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                customStoreFileNameFileChooser.setDragEnabled(false);
-                customStoreFileNameFileChooser.setMultiSelectionEnabled(false);
-                customStoreFileNameFileChooser.setAcceptAllFileFilterUsed(false);
-                customStoreFileNameFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                customStoreFileNameFileChooser.setFileHidingEnabled(true);
-                int dbFileSelectionReply = customStoreFileNameFileChooser.showDialog(burpFrame, "Use");
-                if (dbFileSelectionReply == JFileChooser.APPROVE_OPTION) {
-                    customStoreFileName = customStoreFileNameFileChooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/");
-                } else {
-                    JOptionPane.showMessageDialog(burpFrame, "The following database file will continue to be used:\n\r" + customStoreFileName, extensionName, JOptionPane.INFORMATION_MESSAGE);
+            boolean isLoggingPaused = Boolean.parseBoolean(callbacks.loadExtensionSetting(ConfigMenu.PAUSE_LOGGING_CFG_KEY));
+            if (!isLoggingPaused) {
+                Object[] options = {"Keep the DB file", "Change the DB file", "Pause the logging"};
+                String msg = "Continue to log events into the following database file?\n\r" + customStoreFileName;
+                //Mapping of the buttons with the dialog: options[0] => YES / options[1] => NO / options[2] => CANCEL
+                int loggingQuestionReply = JOptionPane.showOptionDialog(burpFrame, msg, extensionName, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
+                //Case for YES is already handled, use the stored file
+                if (loggingQuestionReply == JOptionPane.YES_OPTION) {
+                    callbacks.saveExtensionSetting(ConfigMenu.PAUSE_LOGGING_CFG_KEY, Boolean.FALSE.toString());
+                    callbacks.issueAlert("Logging is enabled.");
                 }
+                //Case for the NO => Change DB file
+                if (loggingQuestionReply == JOptionPane.NO_OPTION) {
+                    JFileChooser customStoreFileNameFileChooser = new JFileChooser();
+                    customStoreFileNameFileChooser.setDialogTitle(extensionName + " - Select the DB file to use...");
+                    customStoreFileNameFileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+                    customStoreFileNameFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                    customStoreFileNameFileChooser.setDragEnabled(false);
+                    customStoreFileNameFileChooser.setMultiSelectionEnabled(false);
+                    customStoreFileNameFileChooser.setAcceptAllFileFilterUsed(false);
+                    customStoreFileNameFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    customStoreFileNameFileChooser.setFileHidingEnabled(true);
+                    int dbFileSelectionReply = customStoreFileNameFileChooser.showDialog(burpFrame, "Use");
+                    if (dbFileSelectionReply == JFileChooser.APPROVE_OPTION) {
+                        customStoreFileName = customStoreFileNameFileChooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/");
+                    } else {
+                        JOptionPane.showMessageDialog(burpFrame, "The following database file will continue to be used:\n\r" + customStoreFileName, extensionName, JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    callbacks.saveExtensionSetting(ConfigMenu.PAUSE_LOGGING_CFG_KEY, Boolean.FALSE.toString());
+                    callbacks.issueAlert("Logging is enabled.");
+                }
+                //Case for the CANCEL => Pause the logging
+                if (loggingQuestionReply == JOptionPane.CANCEL_OPTION) {
+                    callbacks.saveExtensionSetting(ConfigMenu.PAUSE_LOGGING_CFG_KEY, Boolean.TRUE.toString());
+                    callbacks.issueAlert("Logging is paused.");
+                }
+                //Save the location of the database file chosen by the user
+                callbacks.saveExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY, customStoreFileName);
+            } else {
+                callbacks.issueAlert("Logging is paused.");
             }
-            //Save the location of the database file chosen by the user
-            callbacks.saveExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY, customStoreFileName);
             //Init logger and HTTP listener
             ActivityLogger activityLogger = new ActivityLogger(customStoreFileName, callbacks, trace);
             ActivityHttpListener activityHttpListener = new ActivityHttpListener(activityLogger, trace, callbacks);
