@@ -129,6 +129,9 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 
 Under active development, see the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/5) for details.
 
+* Add the capacity to pause the logging during a Burp working session - Issue [#9](/../../issues/9).
+* Add the capacity to change the DB file during a Burp working session - Issue [#10](/../../issues/10).
+
 **1.0.7**
 
 * Upgrade the version of the third party library used to handle the work with the SQLite DB in order to fix exposure to [CVE-2018-20505](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20505).
