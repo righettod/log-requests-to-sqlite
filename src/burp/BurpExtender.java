@@ -41,15 +41,7 @@ public class BurpExtender implements IBurpExtender {
                 }
                 //Case for the NO => Change DB file
                 if (loggingQuestionReply == JOptionPane.NO_OPTION) {
-                    JFileChooser customStoreFileNameFileChooser = new JFileChooser();
-                    customStoreFileNameFileChooser.setDialogTitle(extensionName + " - Select the DB file to use...");
-                    customStoreFileNameFileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                    customStoreFileNameFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-                    customStoreFileNameFileChooser.setDragEnabled(false);
-                    customStoreFileNameFileChooser.setMultiSelectionEnabled(false);
-                    customStoreFileNameFileChooser.setAcceptAllFileFilterUsed(false);
-                    customStoreFileNameFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    customStoreFileNameFileChooser.setFileHidingEnabled(true);
+                    JFileChooser customStoreFileNameFileChooser = Utilities.createDBFileChooser();
                     int dbFileSelectionReply = customStoreFileNameFileChooser.showDialog(burpFrame, "Use");
                     if (dbFileSelectionReply == JFileChooser.APPROVE_OPTION) {
                         customStoreFileName = customStoreFileNameFileChooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/");

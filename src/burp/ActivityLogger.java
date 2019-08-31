@@ -66,10 +66,21 @@ class ActivityLogger implements IExtensionStateListener {
         //Affect the properties
         this.callbacks = callbacks;
         this.trace = trace;
+        updateStoreLocation(storeName);
+    }
+
+    /**
+     * Change the location where DB is stored.
+     *
+     * @param storeName Name of the storage that will be created (file path).
+     * @throws Exception If connection with the DB cannot be opened or if the DB cannot be created or if the JDBC driver cannot be loaded.
+     */
+    void updateStoreLocation(String storeName) throws Exception {
+        String newUrl = "jdbc:sqlite:" + storeName;
+        this.url = newUrl;
         //Open the connection to the DB
         this.trace.writeLog("Activity information will be stored in database file '" + storeName + "'.");
-        url = "jdbc:sqlite:" + storeName;
-        this.storageConnection = DriverManager.getConnection(url);
+        this.storageConnection = DriverManager.getConnection(newUrl);
         this.storageConnection.setAutoCommit(true);
         this.trace.writeLog("Open new connection to the storage.");
         //Create the table
@@ -78,7 +89,6 @@ class ActivityLogger implements IExtensionStateListener {
             this.trace.writeLog("Recording table initialized.");
         }
     }
-
 
     /**
      * Save an activity event into the storage.
@@ -128,7 +138,7 @@ class ActivityLogger implements IExtensionStateListener {
         long totalAmountDataSent = 0;
         long biggestRequestAmountDataSent = 0;
         long maxHitsBySecond = 0;
-        if(recordsCount > 0){
+        if (recordsCount > 0) {
             //Get the total amount of data sent, we assume here that 1 character = 1 byte
             try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TOTAL_AMOUNT_DATA_SENT)) {
                 try (ResultSet rst = stmt.executeQuery()) {

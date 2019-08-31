@@ -56,6 +56,28 @@ There is an option to exclude the logging of the requests that target images (ch
 
 The list of supported file extensions is [here](resources/settings.properties).
 
+## Pause the logging
+
+There is an option to pause the logging (re-click on the menu to resume the logging):
+
+![Pause Option Menu](example6a.png)
+
+When the logging is paused then when Burp is restarted, it keep in mind that the logging was previously paused and then reflect the state in the menu:
+
+![Pause Option Menu](example6c.png)
+
+Otherwise, when Burp is started and logging was not previously paused then the following options are proposed:
+
+![Pause Option Menu](example6b.png)
+
+## Change the DB file
+
+:warning: This option require that the logging was paused.
+
+There is an option to change the DB file during a Burp working session:
+
+![ChangeDB Option Menu](example7.png)
+
 ## Statistics
 
 There is an option to obtain statistics about the information logged in the database:

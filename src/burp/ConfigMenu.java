@@ -2,6 +2,7 @@ package burp;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -168,6 +169,36 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
             }
         });
         this.cfgMenu.add(subMenuPauseTheLogging);
+        //Add the menu to change the DB file
+        menuText = "Change the DB file";
+        final JMenuItem subMenuDBFileLocationMenuItem = new JMenuItem(menuText);
+        subMenuDBFileLocationMenuItem.addActionListener(
+                new AbstractAction(menuText) {
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            String title = "Change the DB file";
+                            if (!ConfigMenu.IS_LOGGING_PAUSED) {
+                                JOptionPane.showMessageDialog(ConfigMenu.getBurpFrame(), "Logging must be paused prior to update the DB file location!", title, JOptionPane.WARNING_MESSAGE);
+                            } else {
+                                String customStoreFileName = callbacks.loadExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
+                                JFileChooser customStoreFileNameFileChooser = Utilities.createDBFileChooser();
+                                int dbFileSelectionReply = customStoreFileNameFileChooser.showDialog(getBurpFrame(), "Use");
+                                if (dbFileSelectionReply == JFileChooser.APPROVE_OPTION) {
+                                    customStoreFileName = customStoreFileNameFileChooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/");
+                                    activityLogger.updateStoreLocation(customStoreFileName);
+                                    callbacks.saveExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY, customStoreFileName);
+                                    JOptionPane.showMessageDialog(getBurpFrame(), "DB file updated to use:\n\r" + customStoreFileName, title, JOptionPane.INFORMATION_MESSAGE);
+                                } else {
+                                    JOptionPane.showMessageDialog(getBurpFrame(), "The following database file will continue to be used:\n\r" + customStoreFileName, title, JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            }
+                        } catch (Exception exp) {
+                            ConfigMenu.this.trace.writeLog("Cannot update DB file location: " + exp.getMessage());
+                        }
+                    }
+                }
+        );
+        this.cfgMenu.add(subMenuDBFileLocationMenuItem);
         //Add the sub menu to get statistics about the DB.
         menuText = "Get statistics about the logged events";
         final JMenuItem subMenuDBStatsMenuItem = new JMenuItem(menuText);
