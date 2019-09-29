@@ -3,7 +3,7 @@
 [![Coverity Status](https://scan.coverity.com/projects/17099/badge.svg)](https://scan.coverity.com/projects/righettod-log-requests-to-sqlite)
 [![Known Vulnerabilities](https://snyk.io/test/github/righettod/log-requests-to-sqlite/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/righettod/log-requests-to-sqlite?targetFile=build.gradle)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![BAppStore Version](https://img.shields.io/badge/BApp%20Store-v1.0.7-orange.svg)](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747)
+[![BAppStore Version](https://img.shields.io/badge/BApp%20Store-v1.0.8-orange.svg)](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747)
 
 # Log Requests to SQLite
 
@@ -127,12 +127,8 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 
 **1.0.8**
 
-Under active development, see the associated [milestone](https://github.com/righettod/log-requests-to-sqlite/milestone/5) for details.
-
-Beta is published [here](https://github.com/righettod/log-requests-to-sqlite/releases/tag/v1.0.8-beta).
-
 * Add the capacity to pause the logging during a Burp working session - Issue [#9](/../../issues/9).
-* Add the capacity to change the DB file during a Burp working session - Issue [#10](/../../issues/10).
+* Add the capacity to change the DB file during a Burp working session - Issue [#10](/../../issues/10). 
 
 **1.0.7**
 
