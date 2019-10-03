@@ -22,7 +22,7 @@ script:
   - echo "Build within the developer condition"
   - ./gradlew clean fatJar dependencyCheckAnalyze
   - echo "Build within the BAppStore condition"
-  - sed s/gradle-4.8-bin.zip/gradle-3.2.1-bin.zip/g gradle/wrapper/gradle-wrapper.properties > gradle-wrapper.tmp
+  - sed s/gradle-4.8-all.zip/gradle-3.2.1-all.zip/g gradle/wrapper/gradle-wrapper.properties > gradle-wrapper.tmp
   - mv gradle-wrapper.tmp gradle/wrapper/gradle-wrapper.properties
   - ./gradlew -PodcGradlePluginVersion=3.2.1 clean fatJar dependencyCheckAnalyze
 
