@@ -24,7 +24,7 @@ script:
   - echo "Build within the BAppStore condition"
   - sed s/gradle-4.8-all.zip/gradle-3.2.1-all.zip/g gradle/wrapper/gradle-wrapper.properties > gradle-wrapper.tmp
   - mv gradle-wrapper.tmp gradle/wrapper/gradle-wrapper.properties
-  - ./gradlew -PodcGradlePluginVersion=3.2.1 clean fatJar dependencyCheckAnalyze
+  - ./gradlew --gradle-version 3.2.1 -PodcGradlePluginVersion=3.2.1 clean fatJar dependencyCheckAnalyze
 
 addons:
   coverity_scan:
