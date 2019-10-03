@@ -11,6 +11,10 @@ os:
 
 jdk:
   - oraclejdk9
+  - openjdk9
+  - openjdk10
+  - openjdk11
+  - openjdk-ea
 
 before_install:
   - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
@@ -19,12 +23,7 @@ install:
   - chmod +x gradlew
 
 script:
-  - echo "Build within the developer condition"
   - ./gradlew clean fatJar dependencyCheckAnalyze
-  - echo "Build within the BAppStore condition"
-  - sed s/gradle-4.8-all.zip/gradle-3.2.1-all.zip/g gradle/wrapper/gradle-wrapper.properties > gradle-wrapper.tmp
-  - mv gradle-wrapper.tmp gradle/wrapper/gradle-wrapper.properties
-  - ./gradlew --gradle-version 3.2.1 -PodcGradlePluginVersion=3.2.1 clean fatJar dependencyCheckAnalyze
 
 addons:
   coverity_scan:
