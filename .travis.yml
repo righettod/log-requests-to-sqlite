@@ -11,7 +11,6 @@ os:
 
 jdk:
   - oraclejdk9
-  - oraclejdk10
   - oraclejdk11
   - openjdk9
   - openjdk10
