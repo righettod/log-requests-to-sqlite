@@ -128,9 +128,11 @@ The extension is referenced [here](https://portswigger.net/bappstore/d916d945067
 Procedure kindly provided by the PortSwigger support:
 
 1. BApp Author commits fixes/updates to the master repository.
-2. Once BApp Author is happy that updates need to be pushed to the BApp store, the Author creates a pull request so changes can be merged into the forked repository.
+2. Once BApp Author is happy that updates need to be pushed to the BApp store, the Author creates a pull request so changes can be merged into the forked repository: `righettod wants to merge xx commits into PortSwigger:master from righettod:master`
 3. BApp Author notifies PortSwigger support that changes need to be merged, support staff reviews changes and then accepts pull request so the changes are merged.
 4. BApp is then compiled from the forked repository version and then pushed to the BApp store.
+
+
 
 # Change log
 
