@@ -123,6 +123,15 @@ The attribute **url** must be used to download the JAR file.
 
 The extension is referenced [here](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747).
 
+# BApp Store update procedure
+
+Procedure kindly provided by the PortSwigger support:
+
+1. BApp Author commits fixes/updates to the master repository.
+2. Once BApp Author is happy that updates need to be pushed to the BApp store, the Author creates a pull request so changes can be merged into the forked repository.
+3. BApp Author notifies PortSwigger support that changes need to be merged, support staff reviews changes and then accepts pull request so the changes are merged.
+4. BApp is then compiled from the forked repository version and then pushed to the BApp store.
+
 # Change log
 
 **1.0.8**
