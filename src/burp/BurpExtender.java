@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Entry point of the extension
@@ -25,7 +27,10 @@ public class BurpExtender implements IBurpExtender {
             //If the logging is not paused then ask to the user if he want to continue to log the events in the current DB file or pause the logging
             String defaultStoreFileName = new File(System.getProperty("user.home"), extensionName + ".db").getAbsolutePath().replaceAll("\\\\", "/");
             String customStoreFileName = callbacks.loadExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
-            if (customStoreFileName == null) {
+            if (customStoreFileName == null || !Files.exists(Paths.get(customStoreFileName))) {
+                if(customStoreFileName != null){
+                    callbacks.issueAlert("Default store file used because the previously stored DB file do not exist anymore ('" + customStoreFileName + "')");
+                }
                 customStoreFileName = defaultStoreFileName;
             }
             boolean isLoggingPaused = Boolean.parseBoolean(callbacks.loadExtensionSetting(ConfigMenu.PAUSE_LOGGING_CFG_KEY));

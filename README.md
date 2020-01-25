@@ -136,6 +136,11 @@ Procedure kindly provided by the PortSwigger support:
 
 # Change log
 
+**1.0.9** (work in progress)
+
+* Upgrade `sqlite-jdbc` library to the latest available.
+* Fix a bug during extension loading preventing it to crash if the stored DB file do not exist anymore.
+
 **1.0.8**
 
 * Add the capacity to pause the logging during a Burp working session - Issue [#9](/../../issues/9).
