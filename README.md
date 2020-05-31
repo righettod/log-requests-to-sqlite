@@ -136,7 +136,7 @@ Procedure kindly provided by the PortSwigger support:
 
 # Change log
 
-**1.0.9** (work in progress)
+**1.0.9**
 
 * Upgrade `sqlite-jdbc` library to the latest available.
 * Fix a bug during extension loading preventing it to crash if the stored DB file do not exist anymore.
