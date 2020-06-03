@@ -14,7 +14,7 @@ apply plugin: 'java'
 apply plugin: 'org.owasp.dependencycheck'
 
 group 'eu.righettod'
-version '1.0.9'
+version '1.0.10'
 def burpExtensionHomepage = 'https://github.com/righettod/log-requests-to-sqlite'
 def burpExtensionJarName = 'LogRequestsToSQLite.jar'
 
