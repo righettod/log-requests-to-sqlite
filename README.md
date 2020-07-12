@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/righettod/log-requests-to-sqlite.svg?branch=master)](https://travis-ci.org/righettod/log-requests-to-sqlite)
-[![CircleCI](https://circleci.com/gh/righettod/log-requests-to-sqlite/tree/master.svg?style=svg)](https://circleci.com/gh/righettod/log-requests-to-sqlite/tree/master)
-[![Coverity Status](https://scan.coverity.com/projects/17099/badge.svg)](https://scan.coverity.com/projects/righettod-log-requests-to-sqlite)
+[![NightBuild](https://github.com/righettod/log-requests-to-sqlite/workflows/NightBuild/badge.svg)](https://github.com/righettod/log-requests-to-sqlite/actions)
 [![Known Vulnerabilities](https://snyk.io/test/github/righettod/log-requests-to-sqlite/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/righettod/log-requests-to-sqlite?targetFile=build.gradle)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![BAppStore Version](https://img.shields.io/badge/BApp%20Store-v1.0.9-orange.svg)](https://portswigger.net/bappstore/d916d94506734f3490e49391595d8747)
@@ -106,18 +104,7 @@ $ gradlew -PodcGradlePluginVersion=3.2.1 dependencyCheckAnalyze
 
 # Night build
 
-This [link](https://circleci.com/api/v1.1/project/github/righettod/log-requests-to-sqlite/latest/artifacts) provide the **url** where to download a night build of the extension JAR file:
-
-```json
-[ {
-  "path" : "LogRequestsToSQLite-NightBuild.jar",
-  "pretty_path" : "LogRequestsToSQLite-NightBuild.jar",
-  "node_index" : 0,
-  "url" : "https://11-144454154-gh.circle-artifacts.com/0/LogRequestsToSQLite-NightBuild.jar"
-} ]
-```
-
-The attribute **url** must be used to download the JAR file.
+See the [Actions](https://github.com/righettod/log-requests-to-sqlite/actions) section.
 
 # BApp Store
 
@@ -131,8 +118,6 @@ Procedure kindly provided by the PortSwigger support:
 2. Once BApp Author is happy that updates need to be pushed to the BApp store, the Author creates a pull request so changes can be merged into the forked repository: `righettod wants to merge xx commits into PortSwigger:master from righettod:master`
 3. BApp Author notifies PortSwigger support that changes need to be merged, support staff reviews changes and then accepts pull request so the changes are merged.
 4. BApp is then compiled from the forked repository version and then pushed to the BApp store.
-
-
 
 # Change log
 
