@@ -17,17 +17,19 @@ jobs:
         java: [11, 12, 13, 14]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK ${{ matrix.java }}
+    - name: JDK ${{ matrix.java }} - Checkout sources
+      uses: actions/checkout@v2
+    - name: JDK ${{ matrix.java }} - Set up JDK
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
         architecture: x64
-    - name: Grant execute permission for gradlew
+    - name: JDK ${{ matrix.java }} - Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle For JDK ${{ matrix.java }}
+    - name: JDK ${{ matrix.java }} - Build extension JAR file and verify dependencies for CVE
       run: ./gradlew clean fatJar dependencyCheckAnalyze
-    - uses: actions/upload-artifact@v1
+    - name: JDK ${{ matrix.java }} - Upload artifact
+      uses: actions/upload-artifact@v1
       with:
         name: NightBuild-JDK-${{ matrix.java }}
         path: build/libs/LogRequestsToSQLite.jar
