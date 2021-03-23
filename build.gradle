@@ -1,6 +1,6 @@
 buildscript {
     ext{
-        odcPluginVersion = project.hasProperty('odcGradlePluginVersion') ? project.getProperty('odcGradlePluginVersion') : '6.1.2'
+        odcPluginVersion = project.hasProperty('odcGradlePluginVersion') ? project.getProperty('odcGradlePluginVersion') : '6.1.3'
     }
     repositories {
         mavenCentral()
