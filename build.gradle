@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.xerial:sqlite-jdbc:3.34.0'
+    compile 'org.xerial:sqlite-jdbc:3.36.0'
     compile 'net.portswigger.burp.extender:burp-extender-api:2.1'
 }
 
