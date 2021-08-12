@@ -40,11 +40,16 @@ class ActivityHttpListener implements IHttpListener {
      */
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         try {
-            //Save the information of the current request if the message is an HTTP request and according to the restriction options
-            if (messageIsRequest) {
+            //Save the information of the current request if the message is an HTTP response and according to the restriction options
+            if (!messageIsRequest) {
                 IRequestInfo reqInfo = callbacks.getHelpers().analyzeRequest(messageInfo);
+                
+                IResponseInfo responseInfoStatusCode = callbacks.getHelpers().analyzeResponse(messageInfo.getResponse());
+                byte[] responseInfo = messageInfo.getResponse();
+                String statusCode = String.valueOf(responseInfoStatusCode.getStatusCode());
+        
                 if (this.mustLogRequest(reqInfo)) {
-                    this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest());
+                    this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest(), statusCode, responseInfo);
                 }
             }
         } catch (Exception e) {
