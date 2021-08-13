@@ -121,6 +121,12 @@ Procedure kindly provided by the PortSwigger support:
 
 # Change log
 
+**2.0.0** - Pending
+
+* [Task list](/../../issues/47) to complete it.
+* Update all dependencies.
+* Add logging of the HTTP response.
+
 **1.0.9**
 
 * Upgrade `sqlite-jdbc` library to the latest available.
