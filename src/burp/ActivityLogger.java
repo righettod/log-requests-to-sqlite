@@ -25,6 +25,11 @@ class ActivityLogger implements IExtensionStateListener {
     private static final String SQL_BIGGEST_REQUEST_AMOUNT_DATA_SENT = "SELECT MAX(LENGTH(REQUEST_RAW)) FROM ACTIVITY";
     private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC";
 
+    /**
+     * Empty string to use when response must be not be logged.
+     */
+    private static final String EMPTY_RESPONSE_CONTENT = "";
+
 
     /**
      * Use a single DB connection for performance and to prevent DB file locking issue at filesystem level.
@@ -112,7 +117,7 @@ class ActivityLogger implements IExtensionStateListener {
             stmt.setString(5, callbacks.getHelpers().bytesToString(reqContent));
             stmt.setString(6, LocalDateTime.now().format(this.datetimeFormatter));
             stmt.setString(7, statusCode);
-            stmt.setString(8, callbacks.getHelpers().bytesToString(resContent));
+            stmt.setString(8, (resContent != null) ? callbacks.getHelpers().bytesToString(resContent) : EMPTY_RESPONSE_CONTENT);
             int count = stmt.executeUpdate();
             if (count != 1) {
                 this.trace.writeLog("Request was not inserted, no detail available (insertion counter = " + count + ") !");

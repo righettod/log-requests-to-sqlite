@@ -54,6 +54,12 @@ There is an option to exclude the logging of the requests that target images (ch
 
 The list of supported file extensions is [here](resources/settings.properties).
 
+## Include the responses content
+
+There is an option to log also the response content, in raw, associated to a request. By default, this option is disabled.
+
+![Logging of the responses Option Menu](example8.png)
+
 ## Pause the logging
 
 There is an option to pause the logging (re-click on the menu to resume the logging):
@@ -121,7 +127,7 @@ Procedure kindly provided by the PortSwigger support:
 
 # Change log
 
-**2.0.0** - Pending
+**2.0.0**
 
 * [Task list](/../../issues/47) to complete it.
 * Update all dependencies.

@@ -32,6 +32,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     static volatile boolean EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.FALSE;
 
     /**
+     * Expose the configuration option for the logging of the HTTP response content.
+     */
+    static volatile boolean INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.FALSE;
+
+    /**
      * Expose the list of all possible extensions of image resource to work in combination with the option "EXCLUDE_IMAGE_RESOURCE_REQUESTS".
      */
     static final List<String> IMAGE_RESOURCE_EXTENSIONS = new ArrayList<>();
@@ -60,6 +65,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
      * Option configuration key to allow the user to pause the logging.
      */
     public static final String PAUSE_LOGGING_CFG_KEY = "PAUSE_LOGGING";
+
+    /**
+     * Option configuration key for the logging of the HTTP response content.
+     */
+    public static final String INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY = "INCLUDE_HTTP_RESPONSE_CONTENT";
 
     /**
      * Extension root configuration menu.
@@ -107,6 +117,8 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
         EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.parseBoolean(value);
         value = this.callbacks.loadExtensionSetting(PAUSE_LOGGING_CFG_KEY);
         IS_LOGGING_PAUSED = Boolean.parseBoolean(value);
+        value = this.callbacks.loadExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY);
+        INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.parseBoolean(value);
     }
 
     /**
@@ -150,6 +162,23 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
             }
         });
         this.cfgMenu.add(subMenuExcludeImageResources);
+        //Add the menu to include the HTTP responses content in the logging
+        menuText = "Include the responses content";
+        final JCheckBoxMenuItem subMenuIncludeHttpResponseContent = new JCheckBoxMenuItem(menuText, INCLUDE_HTTP_RESPONSE_CONTENT);
+        subMenuIncludeHttpResponseContent.addActionListener(new AbstractAction(menuText) {
+            public void actionPerformed(ActionEvent e) {
+                if (subMenuIncludeHttpResponseContent.isSelected()) {
+                    ConfigMenu.this.callbacks.saveExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.TRUE;
+                    ConfigMenu.this.trace.writeLog("From now, responses content will be logged.");
+                } else {
+                    ConfigMenu.this.callbacks.saveExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.FALSE;
+                    ConfigMenu.this.trace.writeLog("From now, responses content will not be logged.");
+                }
+            }
+        });
+        this.cfgMenu.add(subMenuIncludeHttpResponseContent);
         //Add the menu to pause the logging
         menuText = "Pause the logging";
         final JCheckBoxMenuItem subMenuPauseTheLogging = new JCheckBoxMenuItem(menuText, IS_LOGGING_PAUSED);
