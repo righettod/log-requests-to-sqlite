@@ -132,7 +132,7 @@ Procedure kindly provided by the PortSwigger support:
 * [Task list](/../../issues/47) to complete it.
 * Update all dependencies.
 * Add logging of the HTTP response.
-* Big thanks to @seckek for his PR :medal_sports:.
+* Huge thanks to [@seckek](https://github.com/seckek) for his PR :medal_sports:.
 
 **1.0.9**
 
