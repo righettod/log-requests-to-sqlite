@@ -24,6 +24,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: ${{ matrix.java }}
+        distribution: "temurin"
         architecture: x64
     - name: JDK ${{ matrix.java }} - Grant execute permission for gradlew
       run: chmod +x gradlew
