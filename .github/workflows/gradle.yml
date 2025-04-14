@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [11, 12, 13, 14, 15]
+        java: [17, 21]
 
     steps:
     - name: JDK ${{ matrix.java }} - Checkout sources
