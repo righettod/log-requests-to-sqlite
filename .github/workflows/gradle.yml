@@ -19,9 +19,9 @@ jobs:
 
     steps:
     - name: JDK ${{ matrix.java }} - Checkout sources
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: JDK ${{ matrix.java }} - Set up JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v4
       with:
         java-version: ${{ matrix.java }}
         architecture: x64
@@ -30,7 +30,7 @@ jobs:
     - name: JDK ${{ matrix.java }} - Build extension JAR file and verify dependencies for CVE
       run: ./gradlew clean fatJar dependencyCheckAnalyze
     - name: JDK ${{ matrix.java }} - Upload artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: NightBuild-JDK-${{ matrix.java }}
         path: build/libs/LogRequestsToSQLite.jar
