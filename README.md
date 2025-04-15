@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> A migration to the [Montoya](https://github.com/PortSwigger/burp-extensions-montoya-api) model of extension must be performed.
+
 [![NightBuild](https://github.com/righettod/log-requests-to-sqlite/workflows/NightBuild/badge.svg)](https://github.com/righettod/log-requests-to-sqlite/actions)
 [![Known Vulnerabilities](https://snyk.io/test/github/righettod/log-requests-to-sqlite/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/righettod/log-requests-to-sqlite?targetFile=build.gradle)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
