@@ -1,9 +1,7 @@
 package burp;
 
 import burp.api.montoya.http.message.requests.HttpRequest;
-import burp.api.montoya.http.message.responses.HttpResponse;
 import burp.api.montoya.http.handler.*;
-import burp.api.montoya.MontoyaApi;
 
 import java.util.Locale;
 
@@ -23,21 +21,14 @@ class ActivityHttpListener implements HttpHandler {
     private Trace trace;
 
     /**
-     * The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
-     */
-    private MontoyaApi api;
-
-    /**
      * Constructor.
      *
      * @param activityLogger    Ref on handler that will store the activity information into the activity log storage.
      * @param trace             Ref on project logger.
-     * @param api               The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      */
-    ActivityHttpListener(ActivityLogger activityLogger, Trace trace, MontoyaApi api) {
+    ActivityHttpListener(ActivityLogger activityLogger, Trace trace) {
         this.activityLogger = activityLogger;
         this.trace = trace;
-        this.api = api;
     }
 
     @Override
@@ -92,7 +83,7 @@ class ActivityHttpListener implements HttpHandler {
             //First: We check if we must apply restriction about image resource
             if (ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS) {
                 //Get the file extension of the current URL and remove the parameters from the URL
-                String filename = request.url(); //TODO: Check if this works, don't know about the getFile()..
+                String filename = request.url();
                 if (filename != null && filename.indexOf('?') != -1) {
                     filename = filename.substring(0, filename.indexOf('?')).trim();
                 }

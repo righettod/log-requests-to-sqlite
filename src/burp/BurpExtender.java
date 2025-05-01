@@ -79,7 +79,7 @@ public class BurpExtender implements BurpExtension {
             }
             //Init logger and HTTP listener
             ActivityLogger activityLogger = new ActivityLogger(customStoreFileName, this.api, trace);
-            ActivityHttpListener activityHttpListener = new ActivityHttpListener(activityLogger, trace, this.api);
+            ActivityHttpListener activityHttpListener = new ActivityHttpListener(activityLogger, trace);
             //Setup the configuration menu
             configMenu = new ConfigMenu(this.api, trace, activityLogger);
             SwingUtilities.invokeLater(configMenu);

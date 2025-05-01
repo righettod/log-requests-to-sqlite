@@ -5,7 +5,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import java.awt.Frame;
@@ -16,10 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import burp.api.montoya.BurpExtension;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.persistence.Preferences;
-import burp.api.montoya.extension.ExtensionUnloadingHandler;
 
 /**
  * Menu to configure the extension options.

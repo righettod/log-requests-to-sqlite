@@ -10,7 +10,6 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import burp.api.montoya.http.handler.HttpResponseReceived;
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.message.requests.HttpRequest;
 import burp.api.montoya.http.message.responses.HttpResponse;
@@ -32,12 +31,6 @@ class ActivityLogger implements ExtensionUnloadingHandler {
     private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC";
 
     /**
-     * Empty string to use when response must be not be logged.
-     */
-    private static final String EMPTY_RESPONSE_CONTENT = "";
-
-
-    /**
      * Use a single DB connection for performance and to prevent DB file locking issue at filesystem level.
      */
     private Connection storageConnection;
@@ -46,11 +39,6 @@ class ActivityLogger implements ExtensionUnloadingHandler {
      * DB URL
      */
     private String url;
-
-    /**
-     * The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
-     */
-    private MontoyaApi api;
 
     /**
      * Ref on project logger.
@@ -67,15 +55,12 @@ class ActivityLogger implements ExtensionUnloadingHandler {
      * Constructor.
      *
      * @param storeName     Name of the storage that will be created (file path).
-     * @param api           The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      * @param trace         Ref on project logger.
      * @throws Exception    If connection with the DB cannot be opened or if the DB cannot be created or if the JDBC driver cannot be loaded.
      */
     ActivityLogger(String storeName, MontoyaApi api, Trace trace) throws Exception {
         //Load the SQLite driver
         Class.forName("org.sqlite.JDBC");
-        //Affect the properties
-        this.api = api;
         this.trace = trace;
         updateStoreLocation(storeName);
     }
