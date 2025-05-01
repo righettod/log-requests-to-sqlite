@@ -1,5 +1,4 @@
 name: NightBuild
-
 on:
   push:
     branches: [ master ]
@@ -7,16 +6,13 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 6 * * *'
-
 permissions: read-all
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java: [21]
-
     steps:
     - name: JDK ${{ matrix.java }} - Checkout sources
       uses: actions/checkout@v4
