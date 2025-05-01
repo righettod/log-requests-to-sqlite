@@ -1,23 +1,25 @@
 package burp;
 
+import burp.api.montoya.MontoyaApi;
+
 /**
  * Write a log into the BURP ALERT TAB.
  */
 class Trace {
 
     /**
-     * Ref on Burp tool to have access to the BURP ALERT TAB.
+     * The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      */
-    private final IBurpExtenderCallbacks callbacks;
+    private final MontoyaApi api;
 
 
     /**
      * Constructor.
      *
-     * @param callbacks Ref on Burp tool to have access tot he BURP ALERT TAB.
+     * @param api The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      */
-    Trace(IBurpExtenderCallbacks callbacks) {
-        this.callbacks = callbacks;
+    Trace(MontoyaApi api) {
+        this.api = api;
     }
 
 
@@ -27,7 +29,7 @@ class Trace {
      * @param message Message to write.
      */
     void writeLog(String message) {
-        this.callbacks.issueAlert(message);
+        this.api.logging().logToOutput(message);
     }
 
 }

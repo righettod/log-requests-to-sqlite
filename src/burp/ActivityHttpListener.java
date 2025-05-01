@@ -1,11 +1,14 @@
 package burp;
 
+import burp.api.montoya.http.message.requests.HttpRequest;
+import burp.api.montoya.http.handler.*;
+
 import java.util.Locale;
 
 /**
  * Handle the recording of HTTP activities into the activity log storage.
  */
-class ActivityHttpListener implements IHttpListener {
+class ActivityHttpListener implements HttpHandler {
 
     /**
      * Ref on handler that will store the activity information into the activity log storage.
@@ -18,53 +21,58 @@ class ActivityHttpListener implements IHttpListener {
     private Trace trace;
 
     /**
-     * Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
-     */
-    private IBurpExtenderCallbacks callbacks;
-
-    /**
      * Constructor.
      *
-     * @param activityLogger Ref on handler that will store the activity information into the activity log storage.
-     * @param trace          Ref on project logger.
-     * @param callbacks      Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
+     * @param activityLogger    Ref on handler that will store the activity information into the activity log storage.
+     * @param trace             Ref on project logger.
      */
-    ActivityHttpListener(ActivityLogger activityLogger, Trace trace, IBurpExtenderCallbacks callbacks) {
+    ActivityHttpListener(ActivityLogger activityLogger, Trace trace) {
         this.activityLogger = activityLogger;
         this.trace = trace;
-        this.callbacks = callbacks;
+    }
+
+    @Override
+    public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent requestToBeSent)
+    {
+        //Check if the response will be logged as well. If yes, wait until response is received.
+        if (!ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT) {
+            try {
+                if (this.mustLogRequest(requestToBeSent)) {
+                    this.activityLogger.logEvent(requestToBeSent, null, requestToBeSent.toolSource().toolType().toolName());
+                }
+            } catch (Exception e) {
+                this.trace.writeLog("Cannot save request: " + e.getMessage());
+            }
+        }
+        return RequestToBeSentAction.continueWith(requestToBeSent);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
-        try {
-            //Save the information of the current request if the message is an HTTP response and according to the restriction options
-            if (!messageIsRequest) {
-                IRequestInfo reqInfo = callbacks.getHelpers().analyzeRequest(messageInfo);
-                if (this.mustLogRequest(reqInfo)) {
-                    IResponseInfo responseInfoStatusCode = callbacks.getHelpers().analyzeResponse(messageInfo.getResponse());
-                    String statusCode = String.valueOf(responseInfoStatusCode.getStatusCode());
-                    byte[] responseInfo = null;
-                    if (ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT) {
-                        responseInfo = messageInfo.getResponse();
-                    }
-                    this.activityLogger.logEvent(toolFlag, reqInfo, messageInfo.getRequest(), statusCode, responseInfo);
+    @Override
+    public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived responseReceived)
+    {
+        if (ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT) {
+            try {
+                //Save the information of the current request if the message is an HTTP response and according to the restriction options
+                if (this.mustLogRequest(responseReceived.initiatingRequest())) {
+                    this.activityLogger.logEvent(responseReceived.initiatingRequest(), responseReceived, responseReceived.toolSource().toolType().toolName());
                 }
+            } catch (Exception e) {
+                this.trace.writeLog("Cannot save response: " + e.getMessage());
             }
-        } catch (Exception e) {
-            this.trace.writeLog("Cannot save request: " + e.getMessage());
         }
+        return ResponseReceivedAction.continueWith(responseReceived);
     }
 
     /**
      * Determine if the current request must be logged according to the configuration options selected by the users.
      *
-     * @param reqInfo Information about the current request
+     * @param request HttpRequest object containing all the information about the request
      * @return TRUE if the request must be logged, FALSE otherwise
      */
-    private boolean mustLogRequest(IRequestInfo reqInfo) {
+    private boolean mustLogRequest(HttpRequest request) {
         //By default: Request is logged
         boolean mustLogRequest = true;
 
@@ -75,7 +83,7 @@ class ActivityHttpListener implements IHttpListener {
             //First: We check if we must apply restriction about image resource
             if (ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS) {
                 //Get the file extension of the current URL and remove the parameters from the URL
-                String filename = reqInfo.getUrl().getFile();
+                String filename = request.url();
                 if (filename != null && filename.indexOf('?') != -1) {
                     filename = filename.substring(0, filename.indexOf('?')).trim();
                 }
@@ -91,7 +99,7 @@ class ActivityHttpListener implements IHttpListener {
             }
             //Secondly: We check if we must apply restriction about the URL scope
             //Configuration restrictions options are applied in sequence so we only work here if the request is marked to be logged
-            if (mustLogRequest && ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE && !this.callbacks.isInScope(reqInfo.getUrl())) {
+            if (mustLogRequest && ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE && ! request.isInScope()) {
                 mustLogRequest = false;
             }
         }

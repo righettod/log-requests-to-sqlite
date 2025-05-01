@@ -10,10 +10,15 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.http.message.requests.HttpRequest;
+import burp.api.montoya.http.message.responses.HttpResponse;
+import burp.api.montoya.extension.ExtensionUnloadingHandler;
+
 /**
  * Handle the recording of the activities into the real storage, SQLite local DB here.
  */
-class ActivityLogger implements IExtensionStateListener {
+class ActivityLogger implements ExtensionUnloadingHandler {
 
     /**
      * SQL instructions.
@@ -26,12 +31,6 @@ class ActivityLogger implements IExtensionStateListener {
     private static final String SQL_MAX_HITS_BY_SECOND = "SELECT COUNT(REQUEST_RAW) AS HITS, SEND_DATETIME FROM ACTIVITY GROUP BY SEND_DATETIME ORDER BY HITS DESC";
 
     /**
-     * Empty string to use when response must be not be logged.
-     */
-    private static final String EMPTY_RESPONSE_CONTENT = "";
-
-
-    /**
      * Use a single DB connection for performance and to prevent DB file locking issue at filesystem level.
      */
     private Connection storageConnection;
@@ -40,11 +39,6 @@ class ActivityLogger implements IExtensionStateListener {
      * DB URL
      */
     private String url;
-
-    /**
-     * Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
-     */
-    private IBurpExtenderCallbacks callbacks;
 
     /**
      * Ref on project logger.
@@ -60,16 +54,13 @@ class ActivityLogger implements IExtensionStateListener {
     /**
      * Constructor.
      *
-     * @param storeName Name of the storage that will be created (file path).
-     * @param callbacks Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
-     * @param trace     Ref on project logger.
-     * @throws Exception If connection with the DB cannot be opened or if the DB cannot be created or if the JDBC driver cannot be loaded.
+     * @param storeName     Name of the storage that will be created (file path).
+     * @param trace         Ref on project logger.
+     * @throws Exception    If connection with the DB cannot be opened or if the DB cannot be created or if the JDBC driver cannot be loaded.
      */
-    ActivityLogger(String storeName, IBurpExtenderCallbacks callbacks, Trace trace) throws Exception {
+    ActivityLogger(String storeName, MontoyaApi api, Trace trace) throws Exception {
         //Load the SQLite driver
         Class.forName("org.sqlite.JDBC");
-        //Affect the properties
-        this.callbacks = callbacks;
         this.trace = trace;
         updateStoreLocation(storeName);
     }
@@ -98,26 +89,32 @@ class ActivityLogger implements IExtensionStateListener {
     /**
      * Save an activity event into the storage.
      *
-     * @param toolFlag   A flag indicating the Burp tool that issued the request.
-     *                   Burp tool flags are defined in the
-     *                   <code>IBurpExtenderCallbacks</code> interface.
-     * @param reqInfo    Details of the request to be processed.
-     * @param reqContent Raw content of the request.
-     * @throws Exception If event cannot be saved.
+     * @param request       HttpRequest object containing all information about the request
+     *                      which was either sent or will be sent out soon.
+     * @param response      HttpResponse object containing all information about the response.
+     *                      Is null when only the request ist stored.
+     * @param tool          The name of the tool which was used to issue to request.
+     * @throws Exception    If event cannot be saved.
      */
-    void logEvent(int toolFlag, IRequestInfo reqInfo, byte[] reqContent, String statusCode, byte[] resContent) throws Exception {
+    void logEvent(HttpRequest request, HttpResponse response, String tool) throws Exception {
         //Verify that the DB connection is still opened
         this.ensureDBState();
         //Insert the event into the storage
         try (PreparedStatement stmt = this.storageConnection.prepareStatement(SQL_TABLE_INSERT)) {
             stmt.setString(1, InetAddress.getLocalHost().getHostAddress());
-            stmt.setString(2, reqInfo.getUrl().toString());
-            stmt.setString(3, reqInfo.getMethod());
-            stmt.setString(4, callbacks.getToolName(toolFlag));
-            stmt.setString(5, callbacks.getHelpers().bytesToString(reqContent));
+            stmt.setString(2, request.url());
+            stmt.setString(3, request.method());
+            stmt.setString(4, tool);
+            stmt.setString(5, request.toString()); //Apparently, bodyToString() does not work..
             stmt.setString(6, LocalDateTime.now().format(this.datetimeFormatter));
-            stmt.setString(7, statusCode);
-            stmt.setString(8, (resContent != null) ? callbacks.getHelpers().bytesToString(resContent) : EMPTY_RESPONSE_CONTENT);
+            //Make a distinction if only the request is stored or the response is added as well.
+            if (response != null) {
+                stmt.setString(7, String.valueOf(response.statusCode()));
+                stmt.setString(8, response.bodyToString());
+            } else {
+                stmt.setString(7, null);
+                stmt.setString(8, null);
+            }
             int count = stmt.executeUpdate();
             if (count != 1) {
                 this.trace.writeLog("Request was not inserted, no detail available (insertion counter = " + count + ") !");
@@ -188,8 +185,9 @@ class ActivityLogger implements IExtensionStateListener {
     }
 
     /**
-     * {@inheritDoc}
+     * Unloads the extension by releasing the DB connection.
      */
+    @Override
     public void extensionUnloaded() {
         try {
             if (this.storageConnection != null && !this.storageConnection.isClosed()) {
