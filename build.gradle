@@ -13,8 +13,8 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'org.owasp.dependencycheck'
 
-group 'eu.righettod'
-version '2.0.1'
+group = 'eu.righettod'
+version = '2.0.1'
 def burpExtensionHomepage = 'https://github.com/righettod/log-requests-to-sqlite'
 def burpExtensionJarName = 'LogRequestsToSQLite.jar'
 
@@ -23,8 +23,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.xerial:sqlite-jdbc:3.49.1.0'
-    compile 'net.portswigger.burp.extender:burp-extender-api:2.3'
+    implementation 'org.xerial:sqlite-jdbc:3.49.1.0'
+    // implementation 'net.portswigger.burp.extender:burp-extender-api:2.3'
+    implementation 'net.portswigger.burp.extensions:montoya-api:2025.4'
 }
 
 sourceSets {
@@ -39,15 +40,15 @@ sourceSets {
 }
 
 compileJava {
-    targetCompatibility '11'
-    sourceCompatibility '11'
+    targetCompatibility  = '21'
+    sourceCompatibility = '21'
 }
 
 dependencyCheck {
     autoUpdate = true
     failOnError = true
     failBuildOnCVSS = 1
-    cveValidForHours = 12
+    nvd.validForHours = 12
     suppressionFile = "odc-suppress.xml"
     format = 'JSON'
 }
@@ -56,7 +57,7 @@ task fatJar(type: Jar) {
     manifest {
         attributes("Implementation-Version": project.version, "Implementation-Title": project.name, "Implementation-URL": burpExtensionHomepage)
     }
-    archiveName = burpExtensionJarName
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    archiveBaseName = burpExtensionJarName
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }

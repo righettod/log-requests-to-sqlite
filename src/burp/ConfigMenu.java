@@ -16,10 +16,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import burp.api.montoya.BurpExtension;
+import burp.api.montoya.MontoyaApi;
+import burp.api.montoya.persistence.Preferences;
+import burp.api.montoya.extension.ExtensionUnloadingHandler;
+
 /**
  * Menu to configure the extension options.
  */
-class ConfigMenu implements Runnable, IExtensionStateListener {
+public class ConfigMenu implements Runnable {
+
 
     /**
      * Expose the configuration option for the restriction of the logging of requests in defined target scope.
@@ -77,9 +83,14 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     private JMenu cfgMenu;
 
     /**
-     * Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
+     * The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      */
-    private IBurpExtenderCallbacks callbacks;
+    private MontoyaApi api;
+
+    /**
+     * Access the persistent preferences from the user settings in Burp.
+     */
+    private Preferences preferences;
 
     /**
      * Ref on project logger.
@@ -94,14 +105,16 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
     /**
      * Constructor.
      *
-     * @param callbacks      Ref on Burp tool to manipulate the HTTP requests and have access to API to identify the source of the activity (tool name).
+     * @param api            The MontoyaAPI object used for accessing all the Burp features and ressources such as requests and responses.
      * @param trace          Ref on project logger.
      * @param activityLogger Ref on activity logger in order to enable the access to the DB statistics.
      */
-    ConfigMenu(IBurpExtenderCallbacks callbacks, Trace trace, ActivityLogger activityLogger) {
-        this.callbacks = callbacks;
+    ConfigMenu(MontoyaApi api, Trace trace, ActivityLogger activityLogger) {
+        this.api = api;
         this.trace = trace;
         this.activityLogger = activityLogger;
+        this.preferences = this.api.persistence().preferences();
+
         String value;
         //Load the extension settings
         if (IMAGE_RESOURCE_EXTENSIONS.isEmpty()) {
@@ -110,15 +123,12 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
             Collections.addAll(IMAGE_RESOURCE_EXTENSIONS, value.split(","));
             this.trace.writeLog("Image resource extensions list successfully loaded: " + IMAGE_RESOURCE_EXTENSIONS.toString());
         }
+
         //Load the save state of the options
-        value = this.callbacks.loadExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY);
-        ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.parseBoolean(value);
-        value = this.callbacks.loadExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY);
-        EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.parseBoolean(value);
-        value = this.callbacks.loadExtensionSetting(PAUSE_LOGGING_CFG_KEY);
-        IS_LOGGING_PAUSED = Boolean.parseBoolean(value);
-        value = this.callbacks.loadExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY);
-        INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.parseBoolean(value);
+        ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.TRUE.equals(this.preferences.getBoolean(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY));
+        EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.TRUE.equals(this.preferences.getBoolean(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY));
+        IS_LOGGING_PAUSED = Boolean.TRUE.equals(this.preferences.getBoolean(PAUSE_LOGGING_CFG_KEY));
+        INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.TRUE.equals(this.preferences.getBoolean(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY));
     }
 
     /**
@@ -134,11 +144,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
         subMenuRestrictToScope.addActionListener(new AbstractAction(menuText) {
             public void actionPerformed(ActionEvent e) {
                 if (subMenuRestrictToScope.isSelected()) {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.this.preferences.setBoolean(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.TRUE);
                     ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.TRUE;
                     ConfigMenu.this.trace.writeLog("From now, only requests from defined target scope will be logged.");
                 } else {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.this.preferences.setBoolean(ONLY_INCLUDE_REQUESTS_FROM_SCOPE_CFG_KEY, Boolean.FALSE);
                     ConfigMenu.ONLY_INCLUDE_REQUESTS_FROM_SCOPE = Boolean.FALSE;
                     ConfigMenu.this.trace.writeLog("From now, requests that are not in defined target scope will be also logged.");
                 }
@@ -151,11 +161,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
         subMenuExcludeImageResources.addActionListener(new AbstractAction(menuText) {
             public void actionPerformed(ActionEvent e) {
                 if (subMenuExcludeImageResources.isSelected()) {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.this.preferences.setBoolean(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.TRUE);
                     ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.TRUE;
                     ConfigMenu.this.trace.writeLog("From now, requests for image resource will not be logged.");
                 } else {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.this.preferences.setBoolean(EXCLUDE_IMAGE_RESOURCE_REQUESTS_CFG_KEY, Boolean.FALSE);
                     ConfigMenu.EXCLUDE_IMAGE_RESOURCE_REQUESTS = Boolean.FALSE;
                     ConfigMenu.this.trace.writeLog("From now, requests for image resource will be logged.");
                 }
@@ -168,11 +178,11 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
         subMenuIncludeHttpResponseContent.addActionListener(new AbstractAction(menuText) {
             public void actionPerformed(ActionEvent e) {
                 if (subMenuIncludeHttpResponseContent.isSelected()) {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.this.preferences.setBoolean(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.TRUE);
                     ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.TRUE;
                     ConfigMenu.this.trace.writeLog("From now, responses content will be logged.");
                 } else {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.this.preferences.setBoolean(INCLUDE_HTTP_RESPONSE_CONTENT_CFG_KEY, Boolean.FALSE);
                     ConfigMenu.INCLUDE_HTTP_RESPONSE_CONTENT = Boolean.FALSE;
                     ConfigMenu.this.trace.writeLog("From now, responses content will not be logged.");
                 }
@@ -185,13 +195,13 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
         subMenuPauseTheLogging.addActionListener(new AbstractAction(menuText) {
             public void actionPerformed(ActionEvent e) {
                 if (subMenuPauseTheLogging.isSelected()) {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(PAUSE_LOGGING_CFG_KEY, Boolean.TRUE.toString());
+                    ConfigMenu.this.preferences.setBoolean(PAUSE_LOGGING_CFG_KEY, Boolean.TRUE);
                     ConfigMenu.IS_LOGGING_PAUSED = Boolean.TRUE;
                     ConfigMenu.this.trace.writeLog("From now, logging is paused.");
                 } else {
-                    ConfigMenu.this.callbacks.saveExtensionSetting(PAUSE_LOGGING_CFG_KEY, Boolean.FALSE.toString());
+                    ConfigMenu.this.preferences.setBoolean(PAUSE_LOGGING_CFG_KEY, Boolean.FALSE);
                     ConfigMenu.IS_LOGGING_PAUSED = Boolean.FALSE;
-                    String dbPath = callbacks.loadExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
+                    String dbPath = ConfigMenu.this.preferences.getString(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
                     String msg = "From now, logging is enabled and stored in database file '" + dbPath + "'.";
                     ConfigMenu.this.trace.writeLog(msg);
                 }
@@ -209,13 +219,13 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
                             if (!ConfigMenu.IS_LOGGING_PAUSED) {
                                 JOptionPane.showMessageDialog(ConfigMenu.getBurpFrame(), "Logging must be paused prior to update the DB file location!", title, JOptionPane.WARNING_MESSAGE);
                             } else {
-                                String customStoreFileName = callbacks.loadExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
+                                String customStoreFileName = ConfigMenu.this.preferences.getString(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY);
                                 JFileChooser customStoreFileNameFileChooser = Utilities.createDBFileChooser();
                                 int dbFileSelectionReply = customStoreFileNameFileChooser.showDialog(getBurpFrame(), "Use");
                                 if (dbFileSelectionReply == JFileChooser.APPROVE_OPTION) {
                                     customStoreFileName = customStoreFileNameFileChooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/");
                                     activityLogger.updateStoreLocation(customStoreFileName);
-                                    callbacks.saveExtensionSetting(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY, customStoreFileName);
+                                    ConfigMenu.this.preferences.setString(ConfigMenu.DB_FILE_CUSTOM_LOCATION_CFG_KEY, customStoreFileName);
                                     JOptionPane.showMessageDialog(getBurpFrame(), "DB file updated to use:\n\r" + customStoreFileName, title, JOptionPane.INFORMATION_MESSAGE);
                                 } else {
                                     JOptionPane.showMessageDialog(getBurpFrame(), "The following database file will continue to be used:\n\r" + customStoreFileName, title, JOptionPane.INFORMATION_MESSAGE);
@@ -252,34 +262,9 @@ class ConfigMenu implements Runnable, IExtensionStateListener {
                 }
         );
         this.cfgMenu.add(subMenuDBStatsMenuItem);
-        //Add it to BURP menu
-        JFrame burpFrame = ConfigMenu.getBurpFrame();
-        if (burpFrame != null) {
-            JMenuBar jMenuBar = burpFrame.getJMenuBar();
-            jMenuBar.add(this.cfgMenu);
-            jMenuBar.repaint();
-            this.trace.writeLog("Configuration menu added.");
-        } else {
-            this.trace.writeLog("Cannot add the configuration menu (ref on the BURP frame is null).");
-        }
-    }
 
-    /**
-     * Remove the menu from BURP menu bar.
-     *
-     * @see "https://github.com/PortSwigger/param-miner/blob/master/src/burp/Utilities.java"
-     */
-    @Override
-    public void extensionUnloaded() {
-        JFrame burpFrame = ConfigMenu.getBurpFrame();
-        if (burpFrame != null && this.cfgMenu != null) {
-            JMenuBar jMenuBar = burpFrame.getJMenuBar();
-            jMenuBar.remove(this.cfgMenu);
-            jMenuBar.repaint();
-            this.trace.writeLog("Configuration menu removed.");
-        } else {
-            this.trace.writeLog("Cannot remove the configuration menu (ref on the BURP frame is null).");
-        }
+        //Register the menu in the UI.
+        this.api.userInterface().menuBar().registerMenu(this.cfgMenu);
     }
 
     /**
