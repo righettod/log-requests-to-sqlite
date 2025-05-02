@@ -95,20 +95,10 @@ There is an option to obtain statistics about the information logged in the data
 
 # Build the extension JAR file
 
-Use the following command and the JAR file will be located in folder **build/lib**:
+Use the following command and the JAR file **LogRequestsToSQLite.jar** will be located in folder **target**:
 
 ```
-$ gradlew clean fatJar
-```
-
-# Audit third party dependencies
-
-The goal `dependencyCheckAnalyze` can be used to verify if one of the dependencies used contains CVE.
-
-Use the command line option `-PodcGradlePluginVersion=x.x.x` to specify a specific version of the [OWASP Dependency Check Grable plugin](https://mvnrepository.com/artifact/org.owasp/dependency-check-gradle)
-
-```
-$ gradlew -PodcGradlePluginVersion=3.2.1 dependencyCheckAnalyze
+$ mvn clean package
 ```
 
 # Night build
