@@ -1,5 +1,5 @@
 > [!NOTE]
-> A migration to the [Montoya](https://github.com/PortSwigger/burp-extensions-montoya-api) model of extension was kindly performed by @dominiqueroux 🧡.
+> A migration to the [Montoya](https://github.com/PortSwigger/burp-extensions-montoya-api) model of extension was kindly performed by [@dominiqueroux](https://github.com/dominiqueroux) 🧡.
 
 [![NightBuild](https://github.com/righettod/log-requests-to-sqlite/workflows/NightBuild/badge.svg)](https://github.com/righettod/log-requests-to-sqlite/actions)
 [![Known Vulnerabilities](https://snyk.io/test/github/righettod/log-requests-to-sqlite/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/righettod/log-requests-to-sqlite?targetFile=build.gradle)
