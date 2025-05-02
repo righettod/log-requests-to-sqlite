@@ -27,7 +27,7 @@ jobs:
     - name: JDK ${{ matrix.java }} - Verify dependencies for CVE
       run: |
         go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest
-        osv-scanner scan source -r . 
+        $HOME/go/bin/osv-scanner scan source -r . 
     - name: JDK ${{ matrix.java }} - Upload artifact
       uses: actions/upload-artifact@v4
       with:
