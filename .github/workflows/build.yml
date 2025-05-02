@@ -22,10 +22,12 @@ jobs:
         java-version: ${{ matrix.java }}
         distribution: "temurin"
         architecture: x64
-    - name: JDK ${{ matrix.java }} - Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: JDK ${{ matrix.java }} - Build extension JAR file and verify dependencies for CVE
-      run: ./gradlew clean fatJar dependencyCheckAnalyze
+    - name: JDK ${{ matrix.java }} - Build extension JAR file
+      run: mvn clean package
+    - name: JDK ${{ matrix.java }} - Verify dependencies for CVE
+      run: |
+        go install github.com/google/osv-scanner/v2/cmd/osv-scanner@latest
+        osv-scanner scan source -r . 
     - name: JDK ${{ matrix.java }} - Upload artifact
       uses: actions/upload-artifact@v4
       with:
